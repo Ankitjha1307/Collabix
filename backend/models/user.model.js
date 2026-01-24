@@ -15,18 +15,16 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true 
     },
-    password: {
+    passwordHash: {
         type: String,
         required: true
     },
     avatarUrl: {
         type: String,
-        unique: true
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
+        default: ""
     }
-})
+    },
+    {timestamps: true}
+);
 
 module.exports = mongoose.model('User', userSchema);
