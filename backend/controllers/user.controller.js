@@ -3,8 +3,7 @@ import {asyncHandler} from "../utils/asyncHandler.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import { ApiError } from "../utils/ApiError.js"
 import bcrypt from "bcryptjs"
-import jwt from "jsonwebtoken"
-import mongoose from "mongoose"
+import { generateAccessToken } from "../utils/token.js"
 
 const registerUser = asyncHandler( async (req, res) => {
     const { username, name, email, password } = req.body;
@@ -50,7 +49,43 @@ const registerUser = asyncHandler( async (req, res) => {
 })
 
 const loginUser = asyncHandler( async (req, res) => {
-    
+    const {username, email, password} = req.body;
+
+    if(!((username || email) && password)){
+        throw new ApiError(400, "Username/Email and Password are required to login!");
+    }
+
+    const user = await User.findOne({
+        $or: [{username},{email}]
+    })
+
+    if(!user){
+        throw new ApiError(401, "User does not exist!")
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.passwordHash)
+
+    if(!isPasswordValid){
+        throw new ApiError(401, "Invalid Credentials!");
+    }
+
+    const accessToken = generateAccessToken(user._id);
+
+    return res.status(200).json(
+    new ApiResponse(
+      200,
+      {
+        accessToken,
+        user: {
+          id: user._id,
+          name: user.name,
+          username: user.username,
+          avatarUrl: user.avatarUrl
+        }
+      },
+      "Login successful!"
+    )
+  );
 })
 
-export {registerUser}
+export {registerUser, loginUser}
