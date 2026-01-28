@@ -3,7 +3,7 @@ import {asyncHandler} from "../utils/asyncHandler.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import { ApiError } from "../utils/ApiError.js"
 import bcrypt from "bcryptjs"
-import { generateAccessToken } from "../utils/token.js"
+import { generateAccessToken, generateRefreshToken } from "../utils/token.js"
 
 const registerUser = asyncHandler( async (req, res) => {
     const { username, name, email, password } = req.body;
@@ -70,8 +70,27 @@ const loginUser = asyncHandler( async (req, res) => {
     }
 
     const accessToken = generateAccessToken(user._id);
+    if(!accessToken) {
+        throw new ApiError(500, "Could not generate access token, please try again later!");
+    }
 
-    return res.status(200).json(
+    const refreshToken = generateRefreshToken(user._id);
+    if(!refreshToken) {
+        throw new ApiError(500, "Could not generate refresh token, please try again later!");
+    }
+
+    user.refreshToken = refreshToken;
+    await user.save({validateBeforeSave: false});
+
+    const cookieOptions = {
+    httpOnly: true,
+    secure: true,
+  };
+
+    return res
+    .status(200)
+    .cookie("refreshToken ", refreshToken, cookieOptions)
+    .json(
     new ApiResponse(
       200,
       {
@@ -86,6 +105,14 @@ const loginUser = asyncHandler( async (req, res) => {
       "Login successful!"
     )
   );
+})
+
+const logoutUser = asyncHandler( async ( req, res) => {
+    await User.findByIdAndUpdate(req.user._id, 
+        {
+
+        }
+    )
 })
 
 export {registerUser, loginUser}

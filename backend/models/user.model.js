@@ -26,6 +26,9 @@ const userSchema = new mongoose.Schema({
     avatarUrl: {
         type: String,
         default: ""
+    },
+    refreshToken: {
+        type: String
     }
     },
     {timestamps: true}
