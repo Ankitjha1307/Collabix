@@ -4,6 +4,38 @@ import {ApiResponse} from "../utils/ApiResponse.js"
 import { ApiError } from "../utils/ApiError.js"
 import bcrypt from "bcryptjs"
 import { generateAccessToken, generateRefreshToken } from "../utils/token.js"
+import jwt from "jsonwebtoken";
+
+const refreshAccessToken = asyncHandler(async (req, res) => {
+    const incomingRefreshToken = req.cookies?.refreshToken;
+
+    if(!incomingRefreshToken){
+        throw new ApiError(401, "Unauthorized Access! Refresh Token not found!");
+    }
+
+    try {
+        const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
+        const user = await User.findById(decodedToken?.userId);
+
+        if(!user || user.refreshToken !== incomingRefreshToken) {
+            throw new ApiError(401, "Unauthorized Access! User not found or invalid refresh token!");
+        }
+
+        const newAccessToken = generateAccessToken(user._id);
+
+        return res.status(200).json(
+            new ApiResponse(
+                200,
+                {
+                    accessToken: newAccessToken
+                },
+                "Access Token refreshed successfully!"
+            )
+        )
+    } catch (error) {
+        throw new ApiError(401, "Unauthorized Access! Invalid Refresh Token!");
+    }
+})
 
 const registerUser = asyncHandler( async (req, res) => {
     const { username, name, email, password } = req.body;
@@ -82,14 +114,15 @@ const loginUser = asyncHandler( async (req, res) => {
     user.refreshToken = refreshToken;
     await user.save({validateBeforeSave: false});
 
-    const cookieOptions = {
-    httpOnly: true,
-    secure: true,
-  };
+    const options = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict",
+    }
 
     return res
     .status(200)
-    .cookie("refreshToken ", refreshToken, cookieOptions)
+    .cookie("refreshToken", refreshToken, cookieOptions)
     .json(
     new ApiResponse(
       200,
@@ -128,4 +161,4 @@ const logoutUser = asyncHandler( async ( req, res) => {
     .json(new ApiResponse(200, null, "Logged out successfully"));
 })
 
-export {registerUser, loginUser, logoutUser}
+export { refreshAccessToken, registerUser, loginUser, logoutUser }
