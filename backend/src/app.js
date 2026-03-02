@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 dotenv.config();
-import express from "express";
 import mongoose from "mongoose";
 import userRoutes from "./routes/user.routes.js";
 import cookieParser from "cookie-parser";

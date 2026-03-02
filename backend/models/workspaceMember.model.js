@@ -13,11 +13,19 @@ const workspaceMemberSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ["ADMIN", "MEMBER"],
+        enum: ["OWNER", "ADMIN", "MEMBER"],
         default: "MEMBER"
     }
     },
     {timestamps: true}
 );
+
+workspaceMemberSchema.index(
+  { workspaceId: 1, userId: 1 },
+  { unique: true }
+);
+
+workspaceMemberSchema.index({ userId: 1 });
+workspaceMemberSchema.index({ workspaceId: 1 });
 
 module.exports = mongoose.model("WorkspaceMember", workspaceMemberSchema);
