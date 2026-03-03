@@ -1,7 +1,9 @@
 import Workspace from "../models/workspace.model";
 import WorkspaceMember from "../models/workspaceMember.model";
+import User from "../models/user.model";
 import { ApiError } from "../utils/ApiError";
 import { ApiResponse } from "../utils/ApiResponse";
+import { asyncHandler } from "../utils/asyncHandler";
 
 const createWorkspace = asyncHandler(async(req, res) => {
         const { name } = req.body;
@@ -74,4 +76,88 @@ const getWorkspaceById = asyncHandler(async (req, res) => {
   );
 })
 
-export { createWorkspace, getUserWorkspaces, getWorkspaceById };
+const inviteToWorkspace = asyncHandler(async (req, res) => {
+    const { workspaceId } = req.params;
+    const { username, role } = req.body;
+    const userId = req.user.id;
+    if (!username || !username.trim()) {
+        throw new ApiError(400, "Username is required to invite a member!");
+    }
+
+    const inviteRole = role || "MEMBER";
+
+    const membership = await WorkspaceMember.findOne({
+        workspaceId,
+        userId
+    });
+
+    if(!membership || membership.role !== "OWNER"){
+        throw new ApiError(403, "Access denied! Only workspace owners can invite members.");
+    }
+
+    const userToInvite = await User.findOne({ username });
+
+    if (!userToInvite) {
+        throw new ApiError(404, "User not found");
+    }
+
+    if(userToInvite._id.toString() === userId.toString()){
+        throw new ApiError(400, "Self-invitation is not allowed!");
+    }
+
+    const existingMembership = await WorkspaceMember.findOne({
+        workspaceId,
+        userId: userToInvite._id
+    })
+
+    if(!existingMembership){
+        throw new ApiError(400, "User is already a member of this workspace!");
+    }
+
+    await WorkspaceMember.create({
+        workspaceId,
+        userId: userToInvite._id,
+        role: inviteRole
+    });
+
+    res.status(201)
+    .json(new ApiResponse(201, null, `User ${username} invited to workspace successfully as ${inviteRole}!`));
+})
+
+const removeFromWorkspace = asyncHandler(async (req, res) => {
+    const { workspaceId } = req.params;
+    const { userIdToRemove } = req.body;
+    const userId = req.user.id;
+
+    const membership = await WorkspaceMember.findOne({
+        workspaceId,
+        userId
+    })
+
+    if(!membership || membership.role !== "OWNER"){
+        throw new ApiError(403, "Access denied! Only workspace owners can remove members.");
+    }
+
+    if(userIdToRemove === userId.toString()){
+        throw new ApiError(400, "Self-removal is not allowed! Owners cannot remove themselves from the workspace.");
+    }
+
+    const membershipToRemove = await WorkspaceMember.findOne({
+        workspaceId,
+        userId: userIdToRemove
+    })
+
+    if(!membershipToRemove){
+        throw new ApiError(404, "Membership not found! The user is not a member of this workspace.");
+    }
+
+    await WorkspaceMember.deleteOne({
+        workspaceId,
+        userId: userIdToRemove
+    })
+
+    return res.status(200)
+    .json(new ApiResponse(200, null,`User ${userIdToRemove} removed from workspace successfully!` ))
+})
+
+export { createWorkspace, getUserWorkspaces, getWorkspaceById, inviteToWorkspace, removeFromWorkspace };
