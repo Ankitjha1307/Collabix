@@ -31,6 +31,63 @@ const createWorkspace = asyncHandler(async(req, res) => {
     
 })
 
+const updateWorkspace = asyncHandler(async (req, res) => {
+    const { workspaceId } = req.params;
+    const { name } = req.body;
+    const userId = req.user.id;
+
+    if (!name || !name.trim()) {
+        throw new ApiError(400, "Workspace name required!");
+    }
+
+    const membership = await WorkspaceMember.findOne({
+        workspaceId,
+        userId
+    });
+
+    if (!membership || !["OWNER", "ADMIN"].includes(membership.role)) {
+        throw new ApiError(403, "Only OWNER or ADMIN can update workspace");
+    };
+
+    const workspace = await Workspace.findByIdAndUpdate(
+        workspaceId,
+        { name: name.trim() },
+        { new: true }
+    );
+
+    if (!workspace) {
+        throw new ApiError(404, "Workspace not found");
+    }
+
+    return res.status(200)
+    .json(new ApiResponse(200, workspace, "Workspace updated successfully"));
+});
+
+const deleteWorkspace = asyncHandler(async (req, res) => {
+    const { workspaceId } = req.params;
+    const userId = req.user.id;
+    
+    const membership = await WorkspaceMember.findOne({
+        workspaceId,
+        userId
+    });
+
+    if(!membership || membership.role !== "OWNER"){
+        throw new ApiError(403, "Only OWNER can delete workspace");
+    }
+
+    const workspace = await Workspace.findByIdAndDelete(workspaceId);
+
+    if(!workspace){
+        throw new ApiError(404, "Workspace not found");
+    }
+
+    await WorkspaceMember.deleteMany({ workspaceId });
+
+    return res.status(200)
+    .json(new ApiResponse(200, null, "Workspace deleted successfully!") );
+})
+
 const getUserWorkspaces = asyncHandler(async(req, res) => {
     const userId = req.user.id;
 
@@ -160,4 +217,75 @@ const removeFromWorkspace = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, null,`User ${userIdToRemove} removed from workspace successfully!` ))
 })
 
-export { createWorkspace, getUserWorkspaces, getWorkspaceById, inviteToWorkspace, removeFromWorkspace };
+const updateMemberRole = asyncHandler(async (req, res) => {
+    const { workspaceId } = req.params;
+    const {usernameToUpdate, newRole } = req.body;
+    const userId = req.user.id;
+
+    if (!usernameToUpdate || !usernameToUpdate.trim()) {
+        throw new ApiError(400, "Username is required to update a member's role!");
+    }
+
+    const membership = await WorkspaceMember.findOne({
+        workspaceId,
+        userId
+    })
+
+    if(!membership || membership.role !== "OWNER"){
+        throw new ApiError(403, "Access denied! Only workspace owners can update member roles.");
+    }
+
+    const userToUpdate = await User.findOne({ 
+        username: usernameToUpdate 
+    });
+
+    if (!userToUpdate) {
+        throw new ApiError(404, "User not found");
+    }
+
+    if(userToUpdate._id.toString() === userId.toString()){
+        throw new ApiError(400, "Self-role update is not allowed! Owners cannot change their own role.");
+    }
+
+    const membershipToUpdate = await WorkspaceMember.findOne({
+        workspaceId,
+        userId: userToUpdate._id
+    })
+
+    if(!membershipToUpdate){
+        throw new ApiError(404, "Membership not found! The user is not a member of this workspace");
+    }
+
+    if (membershipToUpdate.role === "OWNER") {
+    throw new ApiError(400, "Cannot modify another OWNER");
+  }
+
+    membershipToUpdate.role = newRole;
+    await membershipToUpdate.save();
+
+    return res.status(200)
+    .json(new ApiResponse(200, null, `Member role of ${usernameToUpdate} updated to ${newRole} successfully!`));
+})
+
+const listWorkspaceMembers = asyncHandler(async (req, res) => {
+    const {workspaceId} = req.params;
+    const userId = req.user.id;
+
+    const membership = await WorkspaceMember.findOne({
+        workspaceId,
+        userId
+    })
+
+    if(!membership){
+        throw new ApiError(403, "Access denied! You are not a member of this workspace.");
+    }
+
+    const members = await WorkspaceMember.find({workspaceId})
+    .populate("userId", "username email")
+    .select("userId username role");
+
+    return res.status(200)
+    .json(new ApiResponse(200, members, "Workspace members retrieved successfully!"));
+})
+
+export { createWorkspace, updateWorkspace, deleteWorkspace, getUserWorkspaces, getWorkspaceById, inviteToWorkspace, removeFromWorkspace, updateMemberRole, listWorkspaceMembers };
