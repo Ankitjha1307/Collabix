@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const workspaceMemberSchema = new mongoose.Schema({
     workspaceId: {
@@ -25,7 +25,10 @@ workspaceMemberSchema.index(
   { unique: true }
 );
 
+workspaceMemberSchema.index({ workspaceId: 1, userId: 1 }, { unique: true });
+
 workspaceMemberSchema.index({ userId: 1 });
+
 workspaceMemberSchema.index({ workspaceId: 1 });
 
-module.exports = mongoose.model("WorkspaceMember", workspaceMemberSchema);
+export const WorkspaceMember = mongoose.model('WorkspaceMember', workspaceMemberSchema);

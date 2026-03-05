@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const workspaceSchema = new mongoose.Schema({
     name: {
@@ -15,4 +15,6 @@ const workspaceSchema = new mongoose.Schema({
     {timestamps: true}
 );
 
-module.exports = mongoose.model("Workspace", workspaceSchema);
+workspaceSchema.index({ createdBy: 1, name: 1 }, { unique: true });
+
+export const Workspace = mongoose.model('Workspace', workspaceSchema);
