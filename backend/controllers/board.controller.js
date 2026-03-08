@@ -3,7 +3,6 @@ import ApiResponse from "../utils/ApiResponse.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { Board } from "../models/board.model.js";
 import { Workspace } from "../models/workspace.model.js";
-import { WorkspaceMember } from "../models/workspaceMember.model.js";
 
 const createBoard = asyncHandler(async (req, res) => {
   const { name, description, workspaceId } = req.body;
@@ -15,18 +14,6 @@ const createBoard = asyncHandler(async (req, res) => {
   const workspace = await Workspace.findById(workspaceId);
   if (!workspace) {
     throw new ApiError(404, "Workspace not found");
-  }
-
-  const membership = await WorkspaceMember.findOne({
-    workspaceId,
-    userId: req.user._id
-  });
-
-  if (!membership || !["OWNER", "ADMIN"].includes(membership.role)) {
-    throw new ApiError(
-      403,
-      "Only OWNER or ADMIN can create boards"
-    );
   }
 
   const board = await Board.create({
@@ -49,20 +36,22 @@ const getBoardsByWorkspace = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Workspace not found");
   }
 
-  const membership = await WorkspaceMember.findOne({
-    workspaceId,
-    userId: req.user._id
-  });
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 20;
+  const skip = (page - 1) * limit;
 
-  if (!membership) {
-    throw new ApiError(403, "Access denied to this workspace");
-  }
+  const boards = await Board.find({ workspaceId })
+  .skip(skip)
+  .limit(limit)
+  .sort({ createdAt: -1 });
 
-  const boards = await Board.find({ workspaceId });
+  const totalBoards = await Board.countDocuments({ workspaceId });
 
   return res
     .status(200)
-    .json(new ApiResponse(200, boards, "Boards fetched successfully!"));
+    .json(new ApiResponse(200,
+     { boards, page, totalPages: Math.ceil(totalBoards / limit), totalBoards }, 
+     "Boards fetched successfully!"));
 });
 
 const getBoardById = asyncHandler(async (req, res) => {
@@ -71,13 +60,7 @@ const getBoardById = asyncHandler(async (req, res) => {
   if (!board) {
     throw new ApiError(404, "Board not found");
   }
-  const membership = await WorkspaceMember.findOne({
-    workspaceId: board.workspaceId,
-    userId: req.user._id
-  });
-  if (!membership) {
-    throw new ApiError(403, "Access denied to this board");
-  }
+  
   return res
     .status(200)
     .json(new ApiResponse(200, board, "Board by ID fetched successfully!"));
@@ -91,15 +74,6 @@ const updateBoard = asyncHandler(async (req, res) => {
   const board = await Board.findById(boardId);
   if (!board) {
     throw new ApiError(404, "Board not found");
-  }
-
-  const membership = await WorkspaceMember.findOne({
-    workspaceId: board.workspaceId,
-    userId: req.user._id
-  });
-
-  if (!membership || !["OWNER", "ADMIN"].includes(membership.role)) {
-    throw new ApiError(403, "Only OWNER or ADMIN can update boards");
   }
 
   if (name && !name.trim()) {
@@ -127,15 +101,7 @@ const deleteBoard = asyncHandler(async (req, res) => {
   if (!board) {
     throw new ApiError(404, "Board not found");
   }
-  const membership = await WorkspaceMember.findOne({
-    workspaceId: board.workspaceId,
-    userId: req.user._id
-});
-
-  if (!membership || !["OWNER", "ADMIN"].includes(membership.role)) {
-    throw new ApiError(403, "Only OWNER or ADMIN can delete boards");
-  }
-
+  
   await Board.findByIdAndDelete(boardId);
 
   return res

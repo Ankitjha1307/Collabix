@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import Task from '../models/task.model.js';
 import User from '../models/user.model.js';
 import asyncHandler from '../utils/asyncHandler.js';
@@ -20,14 +19,6 @@ const createTask = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Board not found");
     }
 
-    const membership = await WorkspaceMember.findOne({
-        workspaceId: board.workspaceId,
-        userId: req.user._id
-    });
-    if (!membership) {
-        throw new ApiError(403, "You are not a member of this workspace");
-    }
-
     const task = await Task.create({
         name: name.trim(),
         description: description ? description.trim() : "",
@@ -45,26 +36,28 @@ const createTask = asyncHandler(async (req, res) => {
 
 const getBoardTasks = asyncHandler(async (req, res) => {
     const { boardId } = req.params;
-    const board = await Board.findById(boardId);
 
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    const board = await Board.findById(boardId);
     if (!board) {
         throw new ApiError(404, "Board not found");
     }
 
-    const membership = await WorkspaceMember.findOne({
-        workspaceId: board.workspaceId,
-        userId: req.user._id
-    });
+    const tasks = await Task.find({ boardId })
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 });
 
-    if (!membership) {
-        throw new ApiError(403, "You are not a member of this workspace");
-    }
-
-    const tasks = await Task.find({ board: boardId });
+    const totalTasks = await Task.countDocuments({ boardId });
 
     return res
     .status(200)
-    .json(new ApiResponse(200, tasks, "Tasks retrieved successfully"));
+    .json(new ApiResponse(200,
+     { tasks, page, totalPages: Math.ceil(totalTasks / limit), totalTasks }, 
+     "Tasks retrieved successfully"));
 });
 
 const updateTask = asyncHandler(async (req, res) => {
@@ -80,15 +73,6 @@ const updateTask = asyncHandler(async (req, res) => {
     const board = await Board.findById(boardId);
     if (!board) {
         throw new ApiError(404, "Board not found");
-    }
-
-    const membership = await WorkspaceMember.findOne({
-        workspaceId: board.workspaceId,
-        userId: req.user._id
-    });
-
-    if (!membership) {
-        throw new ApiError(403, "You are not a member of this workspace");
     }
 
     task.name = name ? name.trim() : task.name;
@@ -119,14 +103,6 @@ const deleteTask = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Board not found");
     }
 
-    const membership = await WorkspaceMember.findOne({
-        workspaceId: board.workspaceId,
-        userId: req.user._id
-    });
-    if(!membership) {
-        throw new ApiError(403, "You are not a member of this workspace");
-    }
-
     await Task.findByIdAndDelete(taskId);
 
     return res
@@ -153,15 +129,6 @@ const assignTask = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Board not found");
     }
 
-    const membership = await WorkspaceMember.findOne({
-        workspaceId: board.workspaceId,
-        userId: req.user._id
-    });
-
-    if (!membership) {
-        throw new ApiError(403, "You are not a member of this workspace");
-    }
-
     task.assignedTo = userId;
     await task.save();
 
@@ -173,29 +140,22 @@ const assignTask = asyncHandler(async (req, res) => {
 const updateTaskStatus = asyncHandler(async (req, res) => {
     const { taskId } = req.params;
     const { status } = req.body;
-    const task = await Task.findById(taskId);
-    if (!task) {
-        throw new ApiError(404, "Task not found");
-    }
-
-    const board = await Board.findById(task.boardId);
-    if (!board) {
-        throw new ApiError(404, "Board not found");
-    }
-
-    const membership = await WorkspaceMember.findOne({
-        workspaceId: board.workspaceId,
-        userId: req.user._id
-    });
-
-    if (!membership) {
-        throw new ApiError(403, "You are not a member of this workspace");
-    }
 
     if (!["TODO", "IN_PROGRESS", "DONE"].includes(status)) {
         throw new ApiError(400, "Invalid status value");
     }
 
+    const task = await Task.findById(taskId);
+    if (!task) {
+        throw new ApiError(404, "Task not found");
+    }
+
+    if (task.assignedTo && task.assignedTo.toString() !== req.user._id.toString() &&
+        !["OWNER", "ADMIN"].includes(req.workspaceRole)) {
+            throw new ApiError(403, "Not allowed to update this task");
+    }
+    
+    
     task.status = status;
     await task.save();
 

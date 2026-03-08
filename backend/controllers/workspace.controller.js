@@ -14,7 +14,7 @@ const createWorkspace = asyncHandler(async(req, res) => {
         }
 
         const workspace = await Workspace.create({
-            name,
+            name: name.trim(),
             createdBy: userId
         });
 
@@ -34,20 +34,10 @@ const createWorkspace = asyncHandler(async(req, res) => {
 const updateWorkspace = asyncHandler(async (req, res) => {
     const { workspaceId } = req.params;
     const { name } = req.body;
-    const userId = req.user.id;
 
     if (!name || !name.trim()) {
         throw new ApiError(400, "Workspace name required!");
     }
-
-    const membership = await WorkspaceMember.findOne({
-        workspaceId,
-        userId
-    });
-
-    if (!membership || !["OWNER", "ADMIN"].includes(membership.role)) {
-        throw new ApiError(403, "Only OWNER or ADMIN can update workspace");
-    };
 
     const workspace = await Workspace.findByIdAndUpdate(
         workspaceId,
@@ -65,17 +55,8 @@ const updateWorkspace = asyncHandler(async (req, res) => {
 
 const deleteWorkspace = asyncHandler(async (req, res) => {
     const { workspaceId } = req.params;
-    const userId = req.user.id;
     
-    const membership = await WorkspaceMember.findOne({
-        workspaceId,
-        userId
-    });
-
-    if(!membership || membership.role !== "OWNER"){
-        throw new ApiError(403, "Only OWNER can delete workspace");
-    }
-
+    
     const workspace = await Workspace.findByIdAndDelete(workspaceId);
 
     if(!workspace){
@@ -104,23 +85,13 @@ const getUserWorkspaces = asyncHandler(async(req, res) => {
         _id: { $in: workspaceIds}
     }).sort({ createdAt: -1});
 
-    res.status(200)
+    return res.status(200)
     .json(new ApiResponse(200, workspaces, "User workspaces fetched successfully!"));
 })
 
 const getWorkspaceById = asyncHandler(async (req, res) => {
     const { workspaceId } = req.params;
-    const userId = req.user.id;
-
-    const membership = await WorkspaceMember.findOne({
-        workspaceId,
-        userId
-    });
-
-    if(!membership){
-        throw new ApiError(403, "Access denied!");   
-    }
-
+    
     const workspace = await Workspace.findById(workspaceId);
 
     if(!workspace){
@@ -129,7 +100,7 @@ const getWorkspaceById = asyncHandler(async (req, res) => {
 
     return res.status(200)
     .json(
-        new ApiResponse(200, {workspace, role: membership.role}, "Workspace fetched successfully")
+        new ApiResponse(200, {workspace, role: req.workspaceRole}, "Workspace fetched successfully")
   );
 })
 
@@ -142,16 +113,6 @@ const inviteToWorkspace = asyncHandler(async (req, res) => {
     }
 
     const inviteRole = role || "MEMBER";
-
-    const membership = await WorkspaceMember.findOne({
-        workspaceId,
-        userId
-    });
-
-    if(!membership || membership.role !== "OWNER"){
-        throw new ApiError(403, "Access denied! Only workspace owners can invite members.");
-    }
-
     const userToInvite = await User.findOne({ username });
 
     if (!userToInvite) {
@@ -167,7 +128,7 @@ const inviteToWorkspace = asyncHandler(async (req, res) => {
         userId: userToInvite._id
     })
 
-    if(!existingMembership){
+    if(existingMembership){
         throw new ApiError(400, "User is already a member of this workspace!");
     }
 
@@ -177,7 +138,7 @@ const inviteToWorkspace = asyncHandler(async (req, res) => {
         role: inviteRole
     });
 
-    res.status(201)
+    return res.status(201)
     .json(new ApiResponse(201, null, `User ${username} invited to workspace successfully as ${inviteRole}!`));
 })
 
@@ -185,15 +146,6 @@ const removeFromWorkspace = asyncHandler(async (req, res) => {
     const { workspaceId } = req.params;
     const { userIdToRemove } = req.body;
     const userId = req.user.id;
-
-    const membership = await WorkspaceMember.findOne({
-        workspaceId,
-        userId
-    })
-
-    if(!membership || membership.role !== "OWNER"){
-        throw new ApiError(403, "Access denied! Only workspace owners can remove members.");
-    }
 
     if(userIdToRemove === userId.toString()){
         throw new ApiError(400, "Self-removal is not allowed! Owners cannot remove themselves from the workspace.");
@@ -224,15 +176,6 @@ const updateMemberRole = asyncHandler(async (req, res) => {
 
     if (!usernameToUpdate || !usernameToUpdate.trim()) {
         throw new ApiError(400, "Username is required to update a member's role!");
-    }
-
-    const membership = await WorkspaceMember.findOne({
-        workspaceId,
-        userId
-    })
-
-    if(!membership || membership.role !== "OWNER"){
-        throw new ApiError(403, "Access denied! Only workspace owners can update member roles.");
     }
 
     const userToUpdate = await User.findOne({ 
@@ -269,23 +212,24 @@ const updateMemberRole = asyncHandler(async (req, res) => {
 
 const listWorkspaceMembers = asyncHandler(async (req, res) => {
     const {workspaceId} = req.params;
-    const userId = req.user.id;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
 
-    const membership = await WorkspaceMember.findOne({
-        workspaceId,
-        userId
-    })
-
-    if(!membership){
-        throw new ApiError(403, "Access denied! You are not a member of this workspace.");
-    }
-
-    const members = await WorkspaceMember.find({workspaceId})
+    const members = await WorkspaceMember.find({ workspaceId })
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 })
     .populate("userId", "username email")
-    .select("userId username role");
+    .select("userId role");
+
+    const totalMembers = await WorkspaceMember.countDocuments({ workspaceId });
+    
 
     return res.status(200)
-    .json(new ApiResponse(200, members, "Workspace members retrieved successfully!"));
+    .json(new ApiResponse(200,
+     { members, page, totalPages: Math.ceil(totalMembers / limit), totalMembers }, 
+     "Workspace members retrieved successfully!"));
 })
 
 export { createWorkspace, updateWorkspace, deleteWorkspace, getUserWorkspaces, getWorkspaceById, inviteToWorkspace, removeFromWorkspace, updateMemberRole, listWorkspaceMembers };
