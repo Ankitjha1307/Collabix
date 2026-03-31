@@ -1,9 +1,9 @@
 import Task from '../models/task.model.js';
-import User from '../models/user.model.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import ApiError from '../utils/ApiError.js';
 import ApiResponse from '../utils/ApiResponse.js';
-import { Board } from '../models/board.model.js';
+import { validateWorkspaceUser } from '../utils/validateWorkspaceUser.js';
+import mongoose from 'mongoose';
 
 
 const createTask = asyncHandler(async (req, res) => {
@@ -14,9 +14,8 @@ const createTask = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Task name is required!");
     }
 
-    const board = await Board.findById(boardId);
-    if (!board) {
-        throw new ApiError(404, "Board not found");
+    if (assignedTo) {
+        await validateWorkspaceUser(req.workspaceId, assignedTo);
     }
 
     const task = await Task.create({
@@ -26,7 +25,8 @@ const createTask = asyncHandler(async (req, res) => {
         priority: priority || "MEDIUM",
         assignedTo: assignedTo || req.user._id,
         dueDate: dueDate || null,
-        board: boardId
+        boardId: boardId,
+        createdBy: req.user._id
     });
 
     return res
@@ -40,11 +40,6 @@ const getBoardTasks = asyncHandler(async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
-
-    const board = await Board.findById(boardId);
-    if (!board) {
-        throw new ApiError(404, "Board not found");
-    }
 
     const tasks = await Task.find({ boardId })
     .skip(skip)
@@ -61,18 +56,15 @@ const getBoardTasks = asyncHandler(async (req, res) => {
 });
 
 const updateTask = asyncHandler(async (req, res) => {
-    const { taskId } = req.params;
+    const task = req.task; 
     const {name, description, status, priority, assignedTo, dueDate} = req.body;
-    const { boardId } = req.params;
-
-    const task = await Task.findById(taskId);
-    if (!task) {
-        throw new ApiError(404, "Task not found");
+    
+    if (name && !name.trim()) {
+        throw new ApiError(400, "Task name cannot be empty");
     }
 
-    const board = await Board.findById(boardId);
-    if (!board) {
-        throw new ApiError(404, "Board not found");
+    if (assignedTo) {
+        await validateWorkspaceUser(req.workspaceId, assignedTo);
     }
 
     task.name = name ? name.trim() : task.name;
@@ -90,44 +82,24 @@ const updateTask = asyncHandler(async (req, res) => {
 });
 
 const deleteTask = asyncHandler(async (req, res) => {
-    const { taskId } = req.params;
-    const { boardId } = req.params;
+    const task = req.task;
 
-    const task = await Task.findById(taskId);
-    if (!task) {
-        throw new ApiError(404, "Task not found");
-    }
-
-    const board = await Board.findById(boardId);
-    if (!board) {
-        throw new ApiError(404, "Board not found");
-    }
-
-    await Task.findByIdAndDelete(taskId);
+    await task.deleteOne();
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, null, "Task deleted successfully"));
+        .status(200)
+        .json(new ApiResponse(200, null, "Task deleted successfully"));
 });
 
 const assignTask = asyncHandler(async (req, res) => {
-    const { taskId } = req.params;
+    const task = req.task;
     const { userId } = req.body;
 
-    const task = await Task.findById(taskId);
-    if (!task) {
-        throw new ApiError(404, "Task not found");
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+        throw new ApiError(400, "Invalid user ID");
     }
 
-    const user = await User.findById(userId);
-    if (!user) {
-        throw new ApiError(404, "User not found");
-    }
-
-    const board = await Board.findById(task.boardId);
-    if (!board) {
-        throw new ApiError(404, "Board not found");
-    }
+    await validateWorkspaceUser(req.workspaceId, userId);
 
     task.assignedTo = userId;
     await task.save();
@@ -138,16 +110,11 @@ const assignTask = asyncHandler(async (req, res) => {
 });
 
 const updateTaskStatus = asyncHandler(async (req, res) => {
-    const { taskId } = req.params;
+    const task = req.task;
     const { status } = req.body;
 
     if (!["TODO", "IN_PROGRESS", "DONE"].includes(status)) {
         throw new ApiError(400, "Invalid status value");
-    }
-
-    const task = await Task.findById(taskId);
-    if (!task) {
-        throw new ApiError(404, "Task not found");
     }
 
     if (task.assignedTo && task.assignedTo.toString() !== req.user._id.toString() &&

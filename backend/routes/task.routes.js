@@ -16,6 +16,7 @@ const router = Router();
 router.post(
   "/board/:boardId",
   verifyToken,
+  attachWorkspace("board"),
   requireWorkspaceRole("OWNER","ADMIN","MEMBER"),
   createTask
 );
@@ -23,6 +24,7 @@ router.post(
 router.get(
   "/board/:boardId",
   verifyToken,
+  attachWorkspace("board"),
   requireWorkspaceRole("OWNER","ADMIN","MEMBER"),
   getBoardTasks
 );
@@ -30,6 +32,7 @@ router.get(
 router.patch(
   "/:taskId",
   verifyToken,
+  attachWorkspace("task"),
   requireWorkspaceRole("OWNER","ADMIN","MEMBER"),
   updateTask
 );
@@ -37,6 +40,7 @@ router.patch(
 router.delete(
   "/:taskId",
   verifyToken,
+  attachWorkspace("task"),
   requireWorkspaceRole("OWNER","ADMIN"),
   deleteTask
 );
@@ -44,6 +48,7 @@ router.delete(
 router.patch(
   "/:taskId/assign",
   verifyToken,
+  attachWorkspace("task"),
   requireWorkspaceRole("OWNER","ADMIN"),
   assignTask
 );
@@ -51,6 +56,7 @@ router.patch(
 router.patch(
   "/:taskId/status",
   verifyToken,
+  attachWorkspace("task"),
   requireWorkspaceRole("OWNER","ADMIN","MEMBER"),
   updateTaskStatus
 );

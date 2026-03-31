@@ -1,6 +1,7 @@
 import { Router } from "express";
 import verifyToken from "../middlewares/auth.middleware.js";
 import requireWorkspaceRole from "../middlewares/workspaceRole.middleware.js";
+import attachWorkspace from "../middlewares/attachWorkspace.middleware.js";
 
 import {
   createBoard,
@@ -29,6 +30,7 @@ router.get(
 router.get(
   "/:boardId",
   verifyToken,
+  attachWorkspace("board"),
   requireWorkspaceRole("OWNER", "ADMIN", "MEMBER"),
   getBoardById
 );
@@ -36,6 +38,7 @@ router.get(
 router.patch(
   "/:boardId",
   verifyToken,
+  attachWorkspace("board"),
   requireWorkspaceRole("OWNER", "ADMIN"),
   updateBoard
 );
@@ -43,6 +46,7 @@ router.patch(
 router.delete(
   "/:boardId",
   verifyToken,
+  attachWorkspace("board"),
   requireWorkspaceRole("OWNER", "ADMIN"),
   deleteBoard
 );
