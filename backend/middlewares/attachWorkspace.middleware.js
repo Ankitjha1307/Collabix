@@ -1,7 +1,8 @@
-import { asyncHandler } from "../utils/asyncHandler";
-import ApiError from "../utils/ApiError";
-import Board from "../models/board.model";
-import Task from "../models/task.model";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import {ApiError} from "../utils/ApiError.js";
+import {Board} from "../models/board.model.js";
+import {Task} from "../models/task.model.js";
+import {Comment} from "../models/comment.model.js";
 
 export const attachWorkspace = (type) => asyncHandler(async (req, res, next) => {
     let workspaceId;
@@ -33,6 +34,32 @@ export const attachWorkspace = (type) => asyncHandler(async (req, res, next) => 
 
         workspaceId = board.workspaceId;
         req.task = task;
+    }
+
+    else if (type === "comment") {
+        const { commentId } = req.params;
+
+        const comment = await Comment.findById(commentId);
+
+        if (!comment) {
+            throw new ApiError(404, "Comment not found");
+        }
+
+        const task = await Task.findById(comment.taskId);
+
+        if (!task) {
+            throw new ApiError(404, "Task not found");
+        }
+
+        const board = await Board.findById(task.boardId);
+
+        if (!board) {
+            throw new ApiError(404, "Board not found");
+        }
+
+        workspaceId = board.workspaceId;
+
+        req.comment = comment;
     }
 
     else {

@@ -1,6 +1,6 @@
-import { WorkspaceMember } from "../models/workspaceMember.model";
-import ApiError from "../utils/ApiError";
-import { asyncHandler } from "../utils/asyncHandler";
+import {WorkspaceMember} from "../models/workspaceMember.model.js";
+import {ApiError} from "../utils/ApiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const requireWorkspaceRole = (...allowedRoles) => asyncHandler(async (req, res, next) => {
     const workspaceId = req.params.workspaceId || req.body.workspaceId || req.workspaceId;

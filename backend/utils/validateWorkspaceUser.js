@@ -1,5 +1,5 @@
-import ApiError from "./ApiError";
-import { WorkspaceMember } from "../models/workspaceMember.model";
+import {ApiError} from "./ApiError.js";
+import { WorkspaceMember } from "../models/workspaceMember.model.js";
 
 export const validateWorkspaceUser = async (workspaceId, userId) => {
     const membership = await WorkspaceMember.findOne({ workspaceId, userId });

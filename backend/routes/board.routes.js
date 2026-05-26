@@ -1,7 +1,7 @@
 import { Router } from "express";
-import verifyToken from "../middlewares/auth.middleware.js";
-import requireWorkspaceRole from "../middlewares/workspaceRole.middleware.js";
-import attachWorkspace from "../middlewares/attachWorkspace.middleware.js";
+import {verifyToken} from "../middlewares/auth.middleware.js";
+import {requireWorkspaceRole} from "../middlewares/workspaceRole.middleware.js";
+import {attachWorkspace} from "../middlewares/attachWorkspace.middleware.js";
 
 import {
   createBoard,
@@ -14,7 +14,7 @@ import {
 const router = Router();
 
 router.post(
-  "/",
+  "/workspace/:workspaceId",
   verifyToken,
   requireWorkspaceRole("OWNER", "ADMIN"),
   createBoard

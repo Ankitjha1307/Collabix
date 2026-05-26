@@ -12,8 +12,7 @@ const boardSchema = new mongoose.Schema({
     },
     workspaceId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Workspace',
-        required: true
+        ref: 'Workspace'
     },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,

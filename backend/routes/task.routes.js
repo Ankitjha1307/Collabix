@@ -1,6 +1,7 @@
 import { Router } from "express";
-import verifyToken from "../middlewares/auth.middleware.js";
-import requireWorkspaceRole from "../middlewares/workspaceRole.middleware.js";
+import {verifyToken} from "../middlewares/auth.middleware.js";
+import {requireWorkspaceRole} from "../middlewares/workspaceRole.middleware.js";
+import {attachWorkspace} from "../middlewares/attachWorkspace.middleware.js";
 
 import {
   createTask,
