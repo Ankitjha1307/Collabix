@@ -11,6 +11,14 @@ router.post("/login", loginUser);
 router.post("/refresh-token", refreshAccessToken);
 
 // protected routes
+router.get("/profile", verifyToken, (req, res) => {
+    res.status(200).json({
+        id: req.user._id,
+        name: req.user.name,
+        username: req.user.username,
+        avatarUrl: req.user.avatarUrl
+    });
+});
 router.post("/logout", verifyToken, logoutUser);
 
 export default router;

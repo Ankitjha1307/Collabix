@@ -5,7 +5,8 @@ import { Board } from "../models/board.model.js";
 import { Workspace } from "../models/workspace.model.js";
 
 const createBoard = asyncHandler(async (req, res) => {
-  const { name, description, workspaceId } = req.body;
+  const { name, description } = req.body;
+  const { workspaceId } = req.params;
 
   if (!name || !name.trim()) {
     throw new ApiError(400, "Board name is required!");

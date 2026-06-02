@@ -92,8 +92,11 @@ const deleteComment = asyncHandler(async(req, res) => {
     if(!comment) {
         throw new ApiError(404, "Comment not found");
     }
-    if(comment.author.toString() !== req.user._id.toString()) {
-        throw new ApiError(403, "You can only delete your own comments");
+    if (
+        comment.author.toString() !== req.user._id.toString() &&
+        !["OWNER", "ADMIN"].includes(req.workspaceRole)
+    ) {
+        throw new ApiError(403, "Not allowed to delete this comment");
     }
     await comment.deleteOne();
     return res.status(200)

@@ -3,7 +3,7 @@ import {ApiError} from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const requireWorkspaceRole = (...allowedRoles) => asyncHandler(async (req, res, next) => {
-    const workspaceId = req.params.workspaceId || req.body.workspaceId || req.workspaceId;
+    const workspaceId = req.workspaceId || req.params?.workspaceId || req.body?.workspaceId;
 
     const membership = await WorkspaceMember.findOne({
         workspaceId,
