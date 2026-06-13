@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button"
 import {
@@ -15,8 +16,9 @@ import { Label } from "@/components/ui/label"
 import { login } from "@/services/auth.service";
 
 export default function CardDemo() {
+  const router = useRouter();
 
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = async (
@@ -27,12 +29,27 @@ export default function CardDemo() {
     console.log("FORM SUBMITTED");
 
     try {
+      const isEmail = identifier.includes("@");
+
       const response = await login({
-        email,
+        email: isEmail ? identifier : undefined,
+        username: isEmail ? undefined : identifier,
         password,
       });
 
-      console.log(response);
+      console.log("LOGIN RESPONSE:", response);
+
+      localStorage.setItem(
+      "accessToken",
+      response.data.accessToken
+    );
+
+    console.log(
+      "Stored Token:",
+      localStorage.getItem("accessToken")
+    );
+
+    router.push("/dashboard");
     } catch (error) {
       console.error(error);
     }
@@ -50,14 +67,14 @@ export default function CardDemo() {
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
-                <Label htmlFor="email">Email/Username</Label>
+                <Label htmlFor="identifier">Email/Username</Label>
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
+                  id="identifier"
+                  type="text"
+                  placeholder="email or Username"
                   required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
                 />
               </div>
               <div className="grid gap-2">
