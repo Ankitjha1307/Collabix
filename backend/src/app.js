@@ -7,11 +7,18 @@ import TaskRoutes from "../routes/task.routes.js";
 import CommentRoutes from "../routes/comment.routes.js";
 import express from "express";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 
 const app = express();
 
 //middleware
 app.use(express.json());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 app.use(cookieParser());
 
 // test route

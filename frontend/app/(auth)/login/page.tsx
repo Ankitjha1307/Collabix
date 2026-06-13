@@ -1,3 +1,5 @@
+"use client";
+import { useState } from "react";
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -10,8 +12,31 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { login } from "@/services/auth.service";
 
 export default function CardDemo() {
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
+    e.preventDefault();
+
+    console.log("FORM SUBMITTED");
+
+    try {
+      const response = await login({
+        email,
+        password,
+      });
+
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <div className="flex min-h-screen items-center justify-center">
       <Card className="w-full max-w-sm">
@@ -22,7 +47,7 @@ export default function CardDemo() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email/Username</Label>
@@ -31,6 +56,8 @@ export default function CardDemo() {
                   type="email"
                   placeholder="m@example.com"
                   required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div className="grid gap-2">
@@ -43,19 +70,25 @@ export default function CardDemo() {
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
               </div>
             </div>
+            <CardFooter className="flex-col gap-2">
+              <Button type="submit" className="w-full">
+                Login
+              </Button>
+              <CardAction className="w-full">
+                <Button variant="link">Don't have an account? Sign up!</Button>
+              </CardAction>
+            </CardFooter>
           </form>
-        </CardContent>
-        <CardFooter className="flex-col gap-2">
-          <Button type="submit" className="w-full">
-            Login
-          </Button>
-          <CardAction className="w-full">
-            <Button variant="link">Don't have an account? Sign up!</Button>
-          </CardAction>
-        </CardFooter>
+        </CardContent> 
       </Card>
     </div>
   )
