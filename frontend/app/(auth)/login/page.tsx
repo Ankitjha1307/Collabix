@@ -14,12 +14,14 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { login } from "@/services/auth.service";
+import Link from "next/link";
 
 export default function CardDemo() {
   const router = useRouter();
 
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement>
@@ -50,8 +52,11 @@ export default function CardDemo() {
     );
 
     router.push("/dashboard");
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      setError(
+        error.response?.data?.message ||
+        "Invalid Credentials. Please try again."
+      );
     }
   };
   return (
@@ -65,6 +70,11 @@ export default function CardDemo() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
+            {error && (
+              <p className="text-red-500">
+                {error}
+              </p>
+            )}
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="identifier">Email/Username</Label>
@@ -80,12 +90,12 @@ export default function CardDemo() {
               <div className="grid gap-2">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
-                  <a
+                  <Link
                     href="#"
                     className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                   >
                     Forgot your password?
-                  </a>
+                  </Link>
                 </div>
                 <Input
                   id="password"
@@ -101,7 +111,9 @@ export default function CardDemo() {
                 Login
               </Button>
               <CardAction className="w-full">
-                <Button variant="link">Don't have an account? Sign up!</Button>
+                <Link href="/register" className="w-full">
+                  <Button variant="link">Don't have an account? Sign up!</Button>
+                </Link>
               </CardAction>
             </CardFooter>
           </form>
