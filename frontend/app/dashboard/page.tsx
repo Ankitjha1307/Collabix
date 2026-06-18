@@ -2,9 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getProfile } from "@/services/auth.service";
-import { logout } from "@/services/auth.service";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -35,17 +33,6 @@ export default function DashboardPage() {
   fetchProfile();
 }, [router]);
 
-  const handleLogout = async () => {
-  try {
-    await logout();
-
-    localStorage.removeItem("accessToken");
-
-    router.push("/login");
-  } catch (error) {
-    console.error(error);
-  }
-};
 
   return (
     <div>
@@ -59,9 +46,6 @@ export default function DashboardPage() {
           <p>@{profile.username}</p>
         </div>
       )}
-      <Button onClick={handleLogout} variant="destructive" className="mt-4">
-        Logout
-      </Button>
     </div>
   );
 }
