@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { register } from "@/services/auth.service";
@@ -23,6 +24,7 @@ export default function CardDemo() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const handleSubmit = async (
       e: React.FormEvent<HTMLFormElement>
     ) => {
@@ -97,17 +99,25 @@ export default function CardDemo() {
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
+              <div className="relative">
+                  <Input
                   id="password"
-                  type="password"
-                  placeholder="Enter your password"
+                  type={showPassword ? "text" : "password"}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-              </div>
+
+                <Button
+                  type="button"
+                  onClick={() =>
+                    setShowPassword(!showPassword)
+                  }
+                  className="absolute right-1 top-1/2 -translate-y-1/2 p-1 text-gray-200 hover:bg-gray-500"
+                >
+                  {showPassword ? <EyeOff /> : <Eye />}
+                </Button>
+                </div>
             </div>
             <CardFooter className="flex-col gap-2">
               <Button type="submit" className="w-full">
