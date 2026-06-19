@@ -1,4 +1,5 @@
 import { AppSidebar } from "@/components/layout/AppSidebar";
+import { Navbar } from "@/components/layout/Navbar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 
 export default function DashboardLayout({
@@ -9,7 +10,13 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main>{children}</main>
+
+      <div className="flex flex-1 flex-col">
+        <Navbar />
+        <main className="flex-1 p-6">
+          {children}
+        </main>
+      </div>
     </SidebarProvider>
   );
 }

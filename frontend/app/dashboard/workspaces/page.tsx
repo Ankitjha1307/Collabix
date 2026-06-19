@@ -1,16 +1,29 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { getUserWorkspaces } from "@/services/workspace.service";
 
 export default function WorkspacesPage() {
-  const workspaces = [
-    {
-      id: "1",
-      name: "College Fest Team",
-    },
-    {
-      id: "2",
-      name: "Collabix Development",
-    },
-  ];
+  interface Workspace {
+  _id: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const [workspaces, setWorkspaces] =
+  useState<Workspace[]>([]);
+
+  useEffect(() => {
+    const fetchWorkspaces = async () => {
+      const workspacesData = await getUserWorkspaces();
+      console.log("WORKSPACES:", workspacesData);
+      setWorkspaces(workspacesData.data);
+    };
+
+    fetchWorkspaces();
+  }, []);
 
   return (
     <div>
@@ -18,10 +31,30 @@ export default function WorkspacesPage() {
         Workspaces
       </h1>
 
-      <div className="space-y-4">
+      <p className="text-muted-foreground m-2">
+        Manage your team workspaces.
+      </p>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {workspaces.map((workspace) => (
-          <Link href={`/dashboard/workspaces/${workspace.id}` } key={workspace.id} className="block p-4 border rounded hover:bg-gray-100">
-            {workspace.name}
+          <Link
+            key={workspace._id}
+            href={`/dashboard/workspaces/${workspace._id}`}
+          >
+            <div className="rounded-xl border p-5 shadow-sm transition-all hover:shadow-md hover:-translate-y-1">
+              <h2 className="text-lg font-semibold">
+                {workspace.name}
+              </h2>
+
+              <p className="mt-2 text-sm text-muted-foreground">
+                Workspace
+              </p>
+
+              <div className="mt-4 text-xs text-muted-foreground">
+                Created{" "}
+                {new Date(workspace.createdAt).toLocaleDateString()}
+              </div>
+            </div>
           </Link>
         ))}
       </div>
