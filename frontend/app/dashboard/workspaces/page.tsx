@@ -2,39 +2,77 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getUserWorkspaces } from "@/services/workspace.service";
+import { createWorkspace, getUserWorkspaces } from "@/services/workspace.service";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Field, FieldGroup } from "@/components/ui/field";
+import type { Workspace } from "@/types/workspace";
 
 export default function WorkspacesPage() {
-  interface Workspace {
-  _id: string;
-  name: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-const [workspaces, setWorkspaces] =
-  useState<Workspace[]>([]);
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
 
   useEffect(() => {
-    const fetchWorkspaces = async () => {
+    
+
+    fetchWorkspaces();
+  }, []);
+
+  const fetchWorkspaces = async () => {
       const workspacesData = await getUserWorkspaces();
       console.log("WORKSPACES:", workspacesData);
       setWorkspaces(workspacesData.data);
     };
 
-    fetchWorkspaces();
-  }, []);
+    const handleCreateWorkspace = async ( e: React.FormEvent) => {
+      e.preventDefault();
+      console.log("FORM SUBMITTED");
+      try {
+        if (!name.trim()) return;
+        console.log("before api");
+
+        const createdWorkspace = await createWorkspace(name);
+
+        setWorkspaces((prev) => [
+          ...prev,
+          createdWorkspace.data,
+        ]);
+
+        setName("");
+        setOpen(false);
+      } catch (error) {
+        console.error("Error creating workspace:", error);
+      }
+    };
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6">
-        Workspaces
-      </h1>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">
+            Workspaces
+          </h1>
 
-      <p className="text-muted-foreground m-2">
-        Manage your team workspaces.
-      </p>
+          <p className="text-muted-foreground">
+            Manage your team workspaces.
+          </p>
+        </div>
 
+        <Button onClick={() => setOpen(true)}>
+          New Workspace
+        </Button>
+      </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {workspaces.map((workspace) => (
           <Link
@@ -58,6 +96,46 @@ const [workspaces, setWorkspaces] =
           </Link>
         ))}
       </div>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent>
+            <form onSubmit={handleCreateWorkspace}>
+                <DialogHeader>
+                  <DialogTitle>
+                    Create Workspace
+                  </DialogTitle>
+
+                  <DialogDescription>
+                    Create a new workspace for your team.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <FieldGroup>
+                  <Field>
+                    <Label htmlFor="name">Name</Label>
+                    <Input
+                      id="name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Workspace name"
+                    />
+                  </Field>
+                </FieldGroup>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button variant="outline">
+                      Cancel
+                    </Button>
+                  </DialogClose>
+                  <Button 
+                    type="submit" 
+                    disabled={!name.trim()}>
+                      Create
+                  </Button>
+                </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
     </div>
   );
 }
