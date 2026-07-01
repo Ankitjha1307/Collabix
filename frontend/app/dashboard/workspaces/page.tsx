@@ -24,8 +24,6 @@ export default function WorkspacesPage() {
   const [name, setName] = useState("");
 
   useEffect(() => {
-    
-
     fetchWorkspaces();
   }, []);
 
