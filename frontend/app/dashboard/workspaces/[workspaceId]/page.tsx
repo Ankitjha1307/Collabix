@@ -14,12 +14,15 @@ import { Button } from "@/components/ui/button";
 import type { Board } from "@/types/board";
 import { getBoardsByWorkspace } from "@/services/board.service";
 import BoardCard from "@/components/board/BoardCard";
+import CreateBoardDialog from "@/components/board/CreateBoardDialog";
+
 
 export default function WorkspacePage() {
   const { workspaceId } = useParams<{ workspaceId: string }>();
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [role, setRole] = useState("");
   const [boards, setBoards] = useState<Board[]>([]);
+  const [open, setOpen] = useState(false);
 
   const fetchWorkspace = async () => {
       try{
@@ -47,7 +50,7 @@ export default function WorkspacePage() {
   useEffect(() => {
     fetchWorkspace();
     fetchBoards();
-}, [workspaceId]);
+  }, [workspaceId]);
 
   
 
@@ -69,7 +72,7 @@ export default function WorkspacePage() {
           Boards
         </h2>
 
-        <Button>
+        <Button onClick={() => setOpen(true)}>
           New Board
         </Button>
       </div>
@@ -77,7 +80,7 @@ export default function WorkspacePage() {
       <div className="mt-6">
         {boards.length === 0 ? (
           <EmptyBoards
-            onCreate={() => {}}
+            onCreate={() => setOpen(true)}
           />
         ) : (
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -91,7 +94,16 @@ export default function WorkspacePage() {
             ))}
           </div>
         )}
-        </div>
+      </div>
+
+      <CreateBoardDialog
+        open={open}
+        onOpenChange={setOpen}
+        workspaceId={workspaceId}
+        onBoardCreated={(board) =>
+          setBoards((prev) => [...prev, board])
+        }
+      />
     </div>
   );
 }

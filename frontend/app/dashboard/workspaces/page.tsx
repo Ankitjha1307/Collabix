@@ -133,7 +133,7 @@ export default function WorkspacesPage() {
                 </DialogFooter>
             </form>
           </DialogContent>
-        </Dialog>
+      </Dialog>
     </div>
   );
 }
