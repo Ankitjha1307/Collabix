@@ -2,23 +2,26 @@
 
 import BoardHeader from "@/components/board/BoardHeader";
 import KanbanBoard from "@/components/board/KanbanBoard";
-import { getBoardById } from "@/services/board.service";
-import type { Board } from "@/types/board";
 import { Separator } from "@/components/ui/separator";
+import { getBoardById } from "@/services/board.service";
+import { getBoardTasks } from "@/services/task.service";
+import type { Board } from "@/types/board";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import type { Task } from "@/types/task";
 
 export default function BoardPage() {
     const { boardId } = useParams<{ boardId: string }>();
     const [board, setBoard] = useState<Board | null>(null);
+    const [tasks, setTasks] = useState<Task[]>([]);
 
     const fetchBoard = async () => {
           try {
-            const response =
-              await getBoardById(boardId);
-              console.log("Board:", response.data);
+            const response = await getBoardById(boardId);
+            const tasksData = await getBoardTasks(boardId);
     
               setBoard(response.data);
+              setTasks(tasksData.tasks);
           } catch (error) {
             console.error(error);
           }
@@ -40,7 +43,7 @@ export default function BoardPage() {
 
       <Separator className="my-8" />
 
-      <KanbanBoard />
+      <KanbanBoard tasks={tasks} />
     </div>
   );
 }
