@@ -19,14 +19,9 @@ export default function DashboardPage() {
   const fetchProfile = async () => {
     try {
       const data = await getProfile();
-      console.log("PROFILE:", data);
-
       setProfile(data);
     } catch (error) {
       console.error(error);
-
-      localStorage.removeItem("accessToken");
-      router.push("/login");
     }
   };
 
