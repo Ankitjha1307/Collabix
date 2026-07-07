@@ -27,6 +27,13 @@ export default function BoardPage() {
           }
     };
 
+    const handleTaskCreated = (createdTask: Task) => {
+      setTasks((currentTasks) => [
+        createdTask,
+        ...currentTasks,
+      ]);
+    };
+
     useEffect(() => {
         fetchBoard();
       }, [boardId]);
@@ -39,6 +46,8 @@ export default function BoardPage() {
       <BoardHeader
         name={board.name}
         description = {board.description}
+        boardId={boardId}
+        onTaskCreated={handleTaskCreated}
       />
 
       <Separator className="my-8" />

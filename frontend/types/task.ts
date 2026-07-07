@@ -22,3 +22,11 @@ export interface BoardTasksData {
   totalPages: number;
   totalTasks: number;
 }
+
+export interface CreateTaskData {
+  name: string;
+  description?: string;
+  status?: TaskStatus;
+  priority?: TaskPriority;
+  dueDate?: string;
+}

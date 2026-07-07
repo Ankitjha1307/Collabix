@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Task } from "@/types/task";
+import TaskCard from "./TaskCard";
 
 interface KanbanColumnProps {
   status: string;
@@ -44,6 +45,12 @@ export default function KanbanColumn({ status, tasks }: KanbanColumnProps) {
         </div>
 
         <Badge variant="secondary">{tasks.length}</Badge>
+      </div>
+
+      <div className="flex flex-1 flex-col gap-3">
+        {tasks.map((task) => (
+          <TaskCard key={task._id} task={task} />
+        ))}
       </div>
     </div>
   );
