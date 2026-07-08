@@ -8,6 +8,7 @@ interface BoardHeaderProps  {
   name: string;
   description?: string;
   boardId: string;
+  workspaceId: string;
   onTaskCreated: (task: Task) => void;
 }
 
@@ -15,6 +16,7 @@ export default function BoardHeader({
     name,
     description,
     boardId,
+    workspaceId,
     onTaskCreated
 } : BoardHeaderProps ) {
   return (
@@ -24,14 +26,15 @@ export default function BoardHeader({
               variant="ghost"
               asChild
               className="w-fit">
-                  <Link href="/dashboard/workspaces">
+                  <Link href={`/dashboard/workspaces/${workspaceId}`}>
                       <ArrowLeft className="mr-2 h-4 w-4" />
-                      Workspaces
+                      Back to Workspace
                   </Link>
             </Button>
             
             <CreateTaskDialog
               boardId={boardId}
+              workspaceId={workspaceId}
               onTaskCreated={onTaskCreated}
             />
         </div>

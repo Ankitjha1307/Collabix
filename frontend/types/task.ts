@@ -10,7 +10,7 @@ export interface Task {
   createdBy: string;
   status: TaskStatus;
   priority: TaskPriority;
-  assignedTo?: string;
+  assignedTo: string;
   dueDate?: string;
   createdAt: string;
   updatedAt: string;
@@ -28,5 +28,6 @@ export interface CreateTaskData {
   description?: string;
   status?: TaskStatus;
   priority?: TaskPriority;
+  assignedTo?: string;
   dueDate?: string;
 }

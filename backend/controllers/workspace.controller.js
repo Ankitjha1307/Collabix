@@ -232,4 +232,23 @@ const listWorkspaceMembers = asyncHandler(async (req, res) => {
      "Workspace members retrieved successfully!"));
 })
 
-export { createWorkspace, updateWorkspace, deleteWorkspace, getUserWorkspaces, getWorkspaceById, inviteToWorkspace, removeFromWorkspace, updateMemberRole, listWorkspaceMembers };
+const listWorkspaceAssignees = asyncHandler(async (req, res) => {
+    const { workspaceId } = req.params;
+
+    const members = await WorkspaceMember.find({ workspaceId })
+        .populate("userId", "username email")
+        .select("userId role")
+        .sort({ createdAt: 1 });
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                members,
+                "Workspace assignees retrieved successfully!"
+            )
+        );
+});
+
+export { createWorkspace, updateWorkspace, deleteWorkspace, getUserWorkspaces, getWorkspaceById, inviteToWorkspace, removeFromWorkspace, updateMemberRole, listWorkspaceMembers, listWorkspaceAssignees };

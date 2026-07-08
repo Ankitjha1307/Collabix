@@ -14,6 +14,14 @@ const createTask = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Task name is required!");
     }
 
+    if (status !== undefined && !["TODO", "IN_PROGRESS", "DONE"].includes(status)) {
+        throw new ApiError(400, "Invalid status value");
+    }
+
+    if (priority !== undefined && !["LOW", "MEDIUM", "HIGH"].includes(priority)) {
+        throw new ApiError(400, "Invalid priority value");
+    }
+
     if (assignedTo) {
         await validateWorkspaceUser(req.workspaceId, assignedTo);
     }
@@ -56,29 +64,45 @@ const getBoardTasks = asyncHandler(async (req, res) => {
 });
 
 const updateTask = asyncHandler(async (req, res) => {
-    const task = req.task; 
-    const {name, description, status, priority, assignedTo, dueDate} = req.body;
-    
-    if (name && !name.trim()) {
-        throw new ApiError(400, "Task name cannot be empty");
+    const task = req.task;
+
+    const {name, description, priority, dueDate} = req.body;
+
+    if (name !== undefined) {
+        if (!name.trim()) {
+            throw new ApiError(400, "Task name cannot be empty");
+        }
+
+        task.name = name.trim();
     }
 
-    if (assignedTo) {
-        await validateWorkspaceUser(req.workspaceId, assignedTo);
+    if (description !== undefined) {
+        task.description = description.trim();
     }
 
-    task.name = name ? name.trim() : task.name;
-    task.description = description ? description.trim() : task.description;
-    task.status = status || task.status;
-    task.priority = priority || task.priority;
-    task.assignedTo = assignedTo || task.assignedTo;
-    task.dueDate = dueDate || task.dueDate;
+    if (priority !== undefined) {
+        if (!["LOW", "MEDIUM", "HIGH"].includes(priority)) {
+            throw new ApiError(400, "Invalid priority value");
+        }
+
+        task.priority = priority;
+    }
+
+    if (dueDate !== undefined) {
+        task.dueDate = dueDate || null;
+    }
 
     await task.save();
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, task, "Task updated successfully"));
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                task,
+                "Task updated successfully"
+            )
+        );
 });
 
 const deleteTask = asyncHandler(async (req, res) => {
@@ -113,15 +137,18 @@ const updateTaskStatus = asyncHandler(async (req, res) => {
     const task = req.task;
     const { status } = req.body;
 
-    if (!["TODO", "IN_PROGRESS", "DONE"].includes(status)) {
-        throw new ApiError(400, "Invalid status value");
-    }
+    const isAssignedUser =
+        task.assignedTo.toString() === req.user._id.toString();
 
-    if (task.assignedTo && task.assignedTo.toString() !== req.user._id.toString() &&
-        !["OWNER", "ADMIN"].includes(req.workspaceRole)) {
-            throw new ApiError(403, "Not allowed to update this task");
+    const hasManagementRole =
+        ["OWNER", "ADMIN"].includes(req.workspaceRole);
+
+    if (!isAssignedUser && !hasManagementRole) {
+        throw new ApiError(
+            403,
+            "Not allowed to update this task's status"
+        );
     }
-    
     
     task.status = status;
     await task.save();

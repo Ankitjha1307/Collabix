@@ -11,7 +11,10 @@ import { useEffect, useState } from "react";
 import type { Task } from "@/types/task";
 
 export default function BoardPage() {
-    const { boardId } = useParams<{ boardId: string }>();
+    const { boardId, workspaceId } = useParams<{
+      boardId: string;
+      workspaceId: string;
+    }>();
     const [board, setBoard] = useState<Board | null>(null);
     const [tasks, setTasks] = useState<Task[]>([]);
 
@@ -47,6 +50,7 @@ export default function BoardPage() {
         name={board.name}
         description = {board.description}
         boardId={boardId}
+        workspaceId={workspaceId}
         onTaskCreated={handleTaskCreated}
       />
 

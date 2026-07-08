@@ -12,7 +12,8 @@ import {
   inviteToWorkspace,
   removeFromWorkspace,
   updateMemberRole,
-  listWorkspaceMembers
+  listWorkspaceMembers,
+  listWorkspaceAssignees
 } from "../controllers/workspace.controller.js";
 
 const router = Router();
@@ -68,6 +69,13 @@ router.get(
   verifyToken,
   requireWorkspaceRole("OWNER", "ADMIN", "MEMBER"),
   listWorkspaceMembers
+);
+
+router.get(
+    "/:workspaceId/assignees",
+    verifyToken,
+    requireWorkspaceRole("OWNER", "ADMIN", "MEMBER"),
+    listWorkspaceAssignees
 );
 
 export default router;

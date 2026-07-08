@@ -1,4 +1,6 @@
 import api from "@/lib/axios";
+import { WorkspaceMembersData } from "@/types/workspace";
+import { WorkspaceAssignee } from "@/types/workspace";
 
 export const getUserWorkspaces = async() => {
     const response = await api.get("/workspaces");
@@ -13,4 +15,24 @@ export const createWorkspace = async(name: string) => {
 export const getWorkspaceById = async ( workspaceId: string) => {
   const response = await api.get(`/workspaces/${workspaceId}`);
   return response.data;
+};
+
+export const getWorkspaceMembers = async (
+  workspaceId: string
+) => {
+  const response = await api.get(
+    `/workspaces/${workspaceId}/members`
+  );
+
+  return response.data.data as WorkspaceMembersData;
+};
+
+export const getWorkspaceAssignees = async (
+  workspaceId: string
+) => {
+  const response = await api.get(
+    `/workspaces/${workspaceId}/assignees`
+  );
+
+  return response.data.data as WorkspaceAssignee[];
 };

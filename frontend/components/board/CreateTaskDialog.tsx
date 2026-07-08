@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -31,14 +31,18 @@ import type {
   TaskPriority,
   TaskStatus,
 } from "@/types/task";
+import type { WorkspaceAssignee } from "@/types/workspace";
+import { getWorkspaceAssignees } from "@/services/workspace.service";
 
 interface CreateTaskDialogProps {
   boardId: string;
+  workspaceId: string;
   onTaskCreated: (task: Task) => void;
 }
 
 export default function CreateTaskDialog({
   boardId,
+  workspaceId,
   onTaskCreated,
 }: CreateTaskDialogProps) {
   const [open, setOpen] = useState(false);
@@ -48,6 +52,8 @@ export default function CreateTaskDialog({
   const [status, setStatus] = useState<TaskStatus>("TODO");
   const [priority, setPriority] = useState<TaskPriority>("MEDIUM");
   const [dueDate, setDueDate] = useState("");
+  const [assignees, setAssignees] = useState<WorkspaceAssignee[]>([]);
+  const [assignedTo, setAssignedTo] = useState("");
 
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState("");
@@ -57,6 +63,7 @@ export default function CreateTaskDialog({
     setDescription("");
     setStatus("TODO");
     setPriority("MEDIUM");
+    setAssignedTo("");
     setDueDate("");
     setError("");
   };
@@ -76,6 +83,7 @@ export default function CreateTaskDialog({
         description: description.trim(),
         status,
         priority,
+        assignedTo: assignedTo || undefined,
         dueDate: dueDate || undefined,
       };
 
@@ -92,6 +100,23 @@ export default function CreateTaskDialog({
       setIsCreating(false);
     }
   };
+
+  useEffect(() => {
+  if (!open) return;
+
+  const fetchAssignees = async () => {
+    try {
+      const assigneeData =
+        await getWorkspaceAssignees(workspaceId);
+
+      setAssignees(assigneeData);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  fetchAssignees();
+}, [open, workspaceId]);
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
@@ -182,6 +207,30 @@ export default function CreateTaskDialog({
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Assignee</Label>
+
+              <Select
+                value={assignedTo}
+                onValueChange={setAssignedTo}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Assign to yourself" />
+                </SelectTrigger>
+
+                <SelectContent>
+                  {assignees.map((assignee) => (
+                    <SelectItem
+                      key={assignee.userId._id}
+                      value={assignee.userId._id}
+                    >
+                      {assignee.userId.username} · {assignee.role}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
