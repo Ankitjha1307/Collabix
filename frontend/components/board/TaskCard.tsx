@@ -11,11 +11,12 @@ import TaskDetailsDialog from "./TaskDetailsDialog";
 
 interface Props {
   task: Task;
+  onTaskUpdated: (task: Task) => void;
 }
 
-export default function TaskCard({ task }: Props) {
+export default function TaskCard({ task, onTaskUpdated }: Props) {
   return (
-    <TaskDetailsDialog task={task}>
+    <TaskDetailsDialog task={task} onTaskUpdated={onTaskUpdated}>
       <Card className="cursor-pointer gap-3 py-4 transition-all duration-200 hover:-translate-y-1 hover:border-purple-500/40 hover:shadow-lg">
         <CardHeader className="px-4">
           <div className="flex items-start justify-between gap-3">

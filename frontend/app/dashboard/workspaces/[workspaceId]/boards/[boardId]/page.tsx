@@ -37,6 +37,16 @@ export default function BoardPage() {
       ]);
     };
 
+    const handleTaskUpdated = (updatedTask: Task) => {
+      setTasks((currentTasks) =>
+        currentTasks.map((task) =>
+          task._id === updatedTask._id
+            ? updatedTask
+            : task
+        )
+      );
+    };
+
     useEffect(() => {
         fetchBoard();
       }, [boardId]);
@@ -56,7 +66,10 @@ export default function BoardPage() {
 
       <Separator className="my-8" />
 
-      <KanbanBoard tasks={tasks} />
+      <KanbanBoard 
+      tasks={tasks}
+      onTaskUpdated={handleTaskUpdated}
+      />
     </div>
   );
 }

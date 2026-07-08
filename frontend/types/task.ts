@@ -31,3 +31,10 @@ export interface CreateTaskData {
   assignedTo?: string;
   dueDate?: string;
 }
+
+export interface UpdateTaskData {
+  name?: string;
+  description?: string;
+  priority?: TaskPriority;
+  dueDate?: string | null;
+}
