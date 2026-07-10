@@ -1,5 +1,5 @@
 import api from "@/lib/axios";
-import { BoardTasksData, CreateTaskData, Task, UpdateTaskData } from "@/types/task";
+import { BoardTasksData, CreateTaskData, Task, UpdateTaskData, TaskStatus } from "@/types/task";
 
 export const getBoardTasks  = async ( boardId: string) => {
   const response = await api.get(`/tasks/board/${boardId}`);
@@ -14,4 +14,18 @@ export const createTask   = async ( boardId: string, taskData: CreateTaskData) =
 export const updateTask = async (taskId: string, taskData: UpdateTaskData) => {
   const response = await api.patch(`/tasks/${taskId}`, taskData);
   return response.data.data as Task;
+};
+
+export const updateTaskStatus = async (taskId: string, status: TaskStatus) => {
+  const response = await api.patch(`/tasks/${taskId}/status`, { status });
+  return response.data.data as Task;
+};
+
+export const assignTask = async (taskId: string, userId: string) => {
+  const response = await api.patch(`/tasks/${taskId}/assign`, { userId });
+  return response.data.data as Task;
+};
+
+export const deleteTask = async (taskId: string) => {
+  await api.delete(`/tasks/${taskId}`);
 };

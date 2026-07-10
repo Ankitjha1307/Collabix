@@ -5,7 +5,7 @@ import TaskCard from "./TaskCard";
 interface KanbanColumnProps {
   status: string;
   tasks: Task[];
-  onTaskUpdated: (task: Task) => void;
+  onTaskSelect: (task: Task) => void;
 }
 
 const statusConfig: Record<
@@ -29,7 +29,7 @@ const statusConfig: Record<
   },
 };
 
-export default function KanbanColumn({ status, tasks, onTaskUpdated }: KanbanColumnProps) {
+export default function KanbanColumn({ status, tasks, onTaskSelect }: KanbanColumnProps) {
   const config = statusConfig[status];
 
   return (
@@ -50,7 +50,7 @@ export default function KanbanColumn({ status, tasks, onTaskUpdated }: KanbanCol
 
       <div className="flex flex-1 flex-col gap-3">
         {tasks.map((task) => (
-          <TaskCard key={task._id} task={task} onTaskUpdated={onTaskUpdated}/>
+          <TaskCard key={task._id} task={task} onTaskSelect={onTaskSelect}/>
         ))}
       </div>
     </div>

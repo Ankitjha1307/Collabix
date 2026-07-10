@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import type { Task, TaskPriority, UpdateTaskData } from "@/types/task";
-import { updateTask } from "@/services/task.service";
+import { useState, useEffect } from "react";
+import type { Task, TaskPriority, TaskStatus, UpdateTaskData } from "@/types/task";
+import { assignTask, updateTask, updateTaskStatus } from "@/services/task.service";
+import { getWorkspaceAssignees } from "@/services/workspace.service";
+import type { WorkspaceAssignee } from "@/types/workspace";
+import { deleteTask } from "@/services/task.service";
 import {
   Dialog,
   DialogContent,
@@ -10,8 +13,18 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,24 +39,32 @@ import {
 
 interface TaskDetailsDialogProps {
   task: Task;
-  children: React.ReactNode;
+  workspaceId: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onTaskUpdated: (task: Task) => void;
+  onTaskDeleted: (taskId: string) => void;
 }
 
 export default function TaskDetailsDialog({
   task,
-  children,
+  workspaceId,
+  open,
+  onOpenChange,
   onTaskUpdated,
+  onTaskDeleted,
 }: TaskDetailsDialogProps) {
   const [name, setName] = useState(task.name);
   const [description, setDescription] = useState(task.description);
   const [priority, setPriority] = useState<TaskPriority>(task.priority);
-
+  const [status, setStatus] = useState<TaskStatus>(task.status);
   const [dueDate, setDueDate] = useState(task.dueDate ? task.dueDate.split("T")[0] : "");
+  const [assignees, setAssignees] = useState<WorkspaceAssignee[]>([]);
+  const [assignedTo, setAssignedTo] = useState(task.assignedTo); 
 
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
-  const [open, setOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleUpdateTask = async () => {
     if (!name.trim()) {
@@ -65,6 +86,14 @@ export default function TaskDetailsDialog({
       const updatedTask = await updateTask(task._id, taskData);
 
       onTaskUpdated(updatedTask);
+      setName(updatedTask.name);
+      setDescription(updatedTask.description);
+      setPriority(updatedTask.priority);
+      setDueDate(
+        updatedTask.dueDate
+          ? updatedTask.dueDate.split("T")[0]
+          : ""
+      );
     } catch (error) {
       console.error(error);
       setError("Failed to update task. Please try again.");
@@ -73,30 +102,63 @@ export default function TaskDetailsDialog({
     }
   };
 
-  const resetForm = () => {
-    setName(task.name);
-    setDescription(task.description);
-    setPriority(task.priority);
-    setDueDate(
-      task.dueDate
-        ? task.dueDate.split("T")[0]
-        : ""
-    );
-    setError("");
+  const handleStatusChange = async (
+    newStatus: TaskStatus) => {
+    try {
+      setError("");
+      const updatedTask = await updateTaskStatus(task._id, newStatus);
+      setStatus(updatedTask.status);
+      onTaskUpdated(updatedTask);
+    } catch (error) {
+      console.error(error);
+      setError("Failed to update task status.");
+    }
   };
 
-  return (
-    <Dialog open={open} onOpenChange={(isOpen) => {
-    if (isOpen) {
-      resetForm();
+  const handleAssigneeChange = async (
+    newAssigneeId: string
+  ) => {
+    try {
+      setError("");
+      const updatedTask = await assignTask(task._id, newAssigneeId);
+      setAssignedTo(updatedTask.assignedTo);
+      onTaskUpdated(updatedTask);
+    } catch (error) {
+      console.error(error);
+      setError("Failed to reassign task.");
     }
+  };
 
-    setOpen(isOpen);
-  }}>
-      <DialogTrigger asChild>
-        {children}
-      </DialogTrigger>
+  const handleDeleteTask = async () => {
+    try {
+      setIsDeleting(true);
+      setError("");
+      await deleteTask(task._id);
+      onTaskDeleted(task._id);
+    } catch (error) {
+      console.error(error);
+      setError("Failed to delete task.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
+  useEffect(() => {
+    const fetchAssignees = async () => {
+      try {
+        const data = await getWorkspaceAssignees(workspaceId);
+        setAssignees(data);
+      } catch (error) {
+        console.error(error);
+        setError("Failed to load workspace assignees.");
+      }
+    };
+
+    fetchAssignees();
+  }, [workspaceId]);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <form
           onSubmit={(event) => {
@@ -163,6 +225,51 @@ export default function TaskDetailsDialog({
             </div>
 
             <div className="space-y-2">
+              <Label>Status</Label>
+
+              <Select
+                value={status}
+                onValueChange={(value) =>
+                  handleStatusChange(value as TaskStatus)
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+
+                <SelectContent>
+                  <SelectItem value="TODO">To Do</SelectItem>
+                  <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                  <SelectItem value="DONE">Done</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Assignee</Label>
+
+              <Select
+                value={assignedTo}
+                onValueChange={handleAssigneeChange}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select assignee" />
+                </SelectTrigger>
+
+                <SelectContent>
+                  {assignees.map((assignee) => (
+                    <SelectItem
+                      key={assignee.userId._id}
+                      value={assignee.userId._id}
+                    >
+                      {assignee.userId.username} ({assignee.role})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor={`task-due-date-${task._id}`}>
                 Due date
               </Label>
@@ -184,7 +291,44 @@ export default function TaskDetailsDialog({
             )}
           </fieldset>
 
-          <DialogFooter>
+          <DialogFooter className="justify-between sm:justify-between">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  type="button"
+                  variant="destructive"
+                >
+                  Delete Task
+                </Button>
+              </AlertDialogTrigger>
+
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Delete this task?
+                  </AlertDialogTitle>
+
+                  <AlertDialogDescription>
+                    This action cannot be undone. The task will be
+                    permanently deleted.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+
+                <AlertDialogFooter>
+                  <AlertDialogCancel disabled={isDeleting}>
+                    Cancel
+                  </AlertDialogCancel>
+
+                  <AlertDialogAction
+                    onClick={handleDeleteTask}
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? "Deleting..." : "Delete"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
             <Button
               type="submit"
               disabled={isSaving || !name.trim()}

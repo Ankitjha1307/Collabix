@@ -9,6 +9,7 @@ import type { Board } from "@/types/board";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { Task } from "@/types/task";
+import TaskDetailsDialog from "@/components/board/TaskDetailsDialog";
 
 export default function BoardPage() {
     const { boardId, workspaceId } = useParams<{
@@ -17,6 +18,9 @@ export default function BoardPage() {
     }>();
     const [board, setBoard] = useState<Board | null>(null);
     const [tasks, setTasks] = useState<Task[]>([]);
+    const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+
+    const selectedTask = tasks.find((task) => task._id === selectedTaskId) ?? null;
 
     const fetchBoard = async () => {
           try {
@@ -47,6 +51,13 @@ export default function BoardPage() {
       );
     };
 
+    const handleTaskDeleted = (taskId: string) => {
+      setTasks((currentTasks) =>
+        currentTasks.filter((task) => task._id !== taskId)
+      );
+      setSelectedTaskId(null);
+    };
+
     useEffect(() => {
         fetchBoard();
       }, [boardId]);
@@ -68,8 +79,23 @@ export default function BoardPage() {
 
       <KanbanBoard 
       tasks={tasks}
-      onTaskUpdated={handleTaskUpdated}
+      onTaskSelect={(task) => setSelectedTaskId(task._id)}
       />
+
+      {selectedTask && (
+        <TaskDetailsDialog
+          task={selectedTask}
+          workspaceId={workspaceId}
+          open={true}
+          onOpenChange={(isOpen) => {
+            if (!isOpen) {
+              setSelectedTaskId(null);
+            }
+          }}
+          onTaskUpdated={handleTaskUpdated}
+          onTaskDeleted={handleTaskDeleted}
+        />
+      )}
     </div>
   );
 }
