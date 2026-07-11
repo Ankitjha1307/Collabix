@@ -27,7 +27,7 @@ router.delete(
     "/comments/:commentId",
     verifyToken,
     attachWorkspace("comment"),
-    requireWorkspaceRole("OWNER","ADMIN"),
+    requireWorkspaceRole("OWNER","ADMIN","MEMBER"),
     deleteComment
 );
 
