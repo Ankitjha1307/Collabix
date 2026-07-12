@@ -161,4 +161,20 @@ const logoutUser = asyncHandler( async ( req, res) => {
     .json(new ApiResponse(200, null, "Logged out successfully"));
 })
 
-export { refreshAccessToken, registerUser, loginUser, logoutUser }
+const getCurrentUser = asyncHandler(async (req, res) => {
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            {
+                _id: req.user._id,
+                name: req.user.name,
+                username: req.user.username,
+                email: req.user.email,
+                avatarUrl: req.user.avatarUrl,
+            },
+            "Profile retrieved successfully"
+        )
+    );
+});
+
+export { refreshAccessToken, registerUser, loginUser, logoutUser, getCurrentUser }

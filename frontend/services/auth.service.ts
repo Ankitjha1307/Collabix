@@ -25,7 +25,7 @@ export async function login(data: LoginData) {
 
 export async function getProfile() {
   const response = await api.get("/auth/profile");
-  return response.data;
+  return response.data.data;
 }
 
 export async function logout() {

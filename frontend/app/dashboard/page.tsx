@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { getProfile } from "@/services/auth.service";
+import type { User } from "@/types/user";
 import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<User | null>(null);
 
   useEffect(() => {
   const token = localStorage.getItem("accessToken");

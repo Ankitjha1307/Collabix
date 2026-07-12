@@ -1,14 +1,10 @@
-export interface CommentUser {
-  _id: string;
-  username: string;
-  name: string;
-}
+import type { User } from "./user";
 
 export interface Comment {
   _id: string;
   content: string;
-  author: CommentUser;
-  mentions: CommentUser[];
+  author: User;
+  mentions: User[];
   taskId: string;
   createdAt: string;
   updatedAt: string;

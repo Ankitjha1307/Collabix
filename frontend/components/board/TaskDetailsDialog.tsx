@@ -6,8 +6,10 @@ import { assignTask, updateTask, updateTaskStatus } from "@/services/task.servic
 import { getWorkspaceAssignees } from "@/services/workspace.service";
 import type { WorkspaceAssignee } from "@/types/workspace";
 import { deleteTask } from "@/services/task.service";
-import {getTaskComments,} from "@/services/comment.service";
+import {getTaskComments, createComment, deleteComment} from "@/services/comment.service";
 import type { Comment } from "@/types/comment";
+import { getProfile } from "@/services/auth.service";
+import type { User } from "@/types/user";
 import {
   Dialog,
   DialogContent,
@@ -66,7 +68,9 @@ export default function TaskDetailsDialog({
   const [assignedTo, setAssignedTo] = useState(task.assignedTo); 
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoadingComments, setIsLoadingComments] = useState(false);
-
+  const [commentContent, setCommentContent] = useState("");
+  const [isCreatingComment, setIsCreatingComment] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -163,6 +167,48 @@ export default function TaskDetailsDialog({
     }
   };
 
+  const handleCreateComment = async () => {
+    if (!commentContent.trim()) {
+      return;
+    }
+
+    try {
+      setIsCreatingComment(true);
+
+      const newComment = await createComment(task._id, {
+        content: commentContent.trim(),
+      });
+      console.log("Comment Author:", newComment.author);
+
+      setComments((currentComments) => [
+        newComment,
+        ...currentComments,
+      ]);
+
+      setCommentContent("");
+    } catch (error) {
+      console.error(error);
+      setError("Failed to create comment.");
+    } finally {
+      setIsCreatingComment(false);
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    try {
+      await deleteComment(commentId);
+
+      setComments((current) =>
+        current.filter(
+          (comment) => comment._id !== commentId
+        )
+      );
+    } catch (error) {
+      console.error(error);
+      setError("Failed to delete comment.");
+    }
+  };
+
   useEffect(() => {
     const fetchAssignees = async () => {
       try {
@@ -176,6 +222,25 @@ export default function TaskDetailsDialog({
 
     fetchAssignees();
   }, [workspaceId]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    fetchComments();
+  }, [task._id, open]);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const user = await getProfile();
+        setCurrentUser(user);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -274,10 +339,10 @@ export default function TaskDetailsDialog({
                   <SelectContent>
                     {assignees.map((assignee) => (
                       <SelectItem
-                        key={assignee.userId._id}
-                        value={assignee.userId._id}
+                        key={assignee._id}
+                        value={assignee._id}
                       >
-                        {assignee.userId.username} ({assignee.role})
+                        {assignee.username}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -311,9 +376,9 @@ export default function TaskDetailsDialog({
                 <p className="text-sm text-muted-foreground">Discuss this task with your team.</p>
               </div>
 
-              <Textarea placeholder="Write a comment..."/>
+              <Textarea placeholder="Write a comment..." value={commentContent} onChange={(event) => setCommentContent(event.target.value)} />
 
-              <Button type="button">Add Comment</Button>
+              <Button type="button" onClick={handleCreateComment} disabled={isCreatingComment ||!commentContent.trim()}>{isCreatingComment ? "Adding..." : "Add Comment"}</Button>
 
               <div className="space-y-3">
                 {isLoadingComments ? (
@@ -321,20 +386,28 @@ export default function TaskDetailsDialog({
                 ) : comments.length === 0 ? (
                   <p className="text-sm text-muted-foreground">No comments yet.</p>
                 ) : (
-                  <div className="space-y-4">
-                    {comments.map((comment) => (
-                      <div
-                        key={comment._id}
-                        className="rounded-lg border p-3"
-                      >
-                        <div className="mb-2 flex items-center justify-between">
-                          <span className="text-sm font-medium">{comment.author.username}</span>
-                          <span className="text-xs text-muted-foreground">{new Date(comment.createdAt).toLocaleString()}</span>
-                        </div>
-                        <p className="text-sm">{comment.content}</p>
+                      <div className="space-y-4">
+                        {comments.map((comment) => {
+                          const canDeleteComment =
+                            currentUser?._id === comment.author._id;
+
+                          return (
+                            <div key={comment._id} className="rounded-lg border p-3">
+                              <div className="mb-2 flex items-center justify-between">
+                                <span className="text-sm font-medium">{comment.author.username}</span>
+
+                                <div className="flex items-center gap-3">
+                                  <span className="text-xs text-muted-foreground">
+                                    {new Date(comment.createdAt).toLocaleString()}
+                                  </span>
+
+                                  {canDeleteComment && (<Button size="sm" variant="ghost" onClick={() => handleDeleteComment(comment._id)}>Delete</Button>)}
+                                </div>
+                              </div>
+                              <p className="text-sm">{comment.content}</p>
+                            </div>
+                        )})}
                       </div>
-                    ))}
-                  </div>
                 )}
               </div>
             </div>

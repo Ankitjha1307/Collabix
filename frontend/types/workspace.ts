@@ -1,3 +1,5 @@
+import { User } from "./user";
+
 export interface Workspace {
   _id: string;
   name: string;
@@ -6,18 +8,12 @@ export interface Workspace {
   updatedAt: string;
 }
 
-export interface WorkspaceMemberUser {
-  _id: string;
-  username: string;
-  email: string;
-}
-
 export interface WorkspaceMember {
-  userId: WorkspaceMemberUser;
+  userId: User;
   role: "OWNER" | "ADMIN" | "MEMBER";
 }
 
-export type WorkspaceAssignee = WorkspaceMember;
+export type WorkspaceAssignee = User;
 
 export interface WorkspaceMembersData {
   members: WorkspaceMember[];

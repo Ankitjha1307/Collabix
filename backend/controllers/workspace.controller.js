@@ -236,19 +236,21 @@ const listWorkspaceAssignees = asyncHandler(async (req, res) => {
     const { workspaceId } = req.params;
 
     const members = await WorkspaceMember.find({ workspaceId })
-        .populate("userId", "username email")
-        .select("userId role")
+        .populate("userId", "name username email")
+        .select("userId")
         .sort({ createdAt: 1 });
 
+    const assignees = members.map((member) => member.userId);
+
     return res
-        .status(200)
-        .json(
-            new ApiResponse(
-                200,
-                members,
-                "Workspace assignees retrieved successfully!"
-            )
-        );
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            assignees,
+            "Workspace assignees retrieved successfully!"
+        )
+    );
 });
 
 export { createWorkspace, updateWorkspace, deleteWorkspace, getUserWorkspaces, getWorkspaceById, inviteToWorkspace, removeFromWorkspace, updateMemberRole, listWorkspaceMembers, listWorkspaceAssignees };

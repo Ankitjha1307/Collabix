@@ -38,9 +38,12 @@ const createComment = asyncHandler(async(req, res) => {
         mentions: filteredMentions
     });
 
+    const populatedComment = await Comment.findById(comment._id)
+    .populate("author", "name username")
+    .populate("mentions", "name username");
 
     return res.status(201)
-    .json(new ApiResponse(201, comment, "Comment created successfully"));
+    .json(new ApiResponse(201, populatedComment, "Comment created successfully"));
 });
 
 const getTaskComments = asyncHandler(async(req, res) => {
