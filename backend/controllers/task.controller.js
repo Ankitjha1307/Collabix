@@ -108,11 +108,13 @@ const updateTask = asyncHandler(async (req, res) => {
 const deleteTask = asyncHandler(async (req, res) => {
     const task = req.task;
 
+    await Comment.deleteMany({taskId: task._id});
+
     await task.deleteOne();
 
     return res
-        .status(200)
-        .json(new ApiResponse(200, null, "Task deleted successfully"));
+    .status(200)
+    .json(new ApiResponse(200, null, "Task deleted successfully"));
 });
 
 const assignTask = asyncHandler(async (req, res) => {

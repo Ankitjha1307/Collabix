@@ -223,10 +223,10 @@ export default function CreateTaskDialog({
                 <SelectContent>
                   {assignees.map((assignee) => (
                     <SelectItem
-                      key={assignee.userId._id}
-                      value={assignee.userId._id}
+                      key={assignee._id}
+                      value={assignee._id}
                     >
-                      {assignee.userId.username} · {assignee.role}
+                      {assignee.username}
                     </SelectItem>
                   ))}
                 </SelectContent>

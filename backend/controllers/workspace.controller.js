@@ -1,6 +1,9 @@
 import {Workspace} from "../models/workspace.model.js";
 import {WorkspaceMember} from "../models/workspaceMember.model.js";
 import {User} from "../models/user.model.js";
+import { Board } from "../models/board.model.js";
+import { Task } from "../models/task.model.js";
+import { Comment } from "../models/comment.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -56,14 +59,26 @@ const updateWorkspace = asyncHandler(async (req, res) => {
 const deleteWorkspace = asyncHandler(async (req, res) => {
     const { workspaceId } = req.params;
     
-    
-    const workspace = await Workspace.findByIdAndDelete(workspaceId);
-
+    const workspace = await Workspace.findById(workspaceId);
     if(!workspace){
         throw new ApiError(404, "Workspace not found");
     }
 
-    await WorkspaceMember.deleteMany({ workspaceId });
+    const boards = await Board.find({ workspaceId }).select("_id");
+    const boardIds = boards.map(board => board._id);
+
+    const tasks = await Task.find({boardId: { $in: boardIds }}).select("_id");
+    const taskIds = tasks.map(task => task._id);
+
+    await Comment.deleteMany({taskId: { $in: taskIds }});
+
+    await Task.deleteMany({boardId: { $in: boardIds }});
+
+    await Board.deleteMany({workspaceId});
+
+    await WorkspaceMember.deleteMany({workspaceId});
+
+    await workspace.deleteOne();
 
     return res.status(200)
     .json(new ApiResponse(200, null, "Workspace deleted successfully!") );

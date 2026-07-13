@@ -3,6 +3,8 @@ import {ApiResponse} from "../utils/ApiResponse.js";
 import {asyncHandler} from "../utils/asyncHandler.js";
 import { Board } from "../models/board.model.js";
 import { Workspace } from "../models/workspace.model.js";
+import { Task } from "../models/task.model.js";
+import { Comment } from "../models/comment.model.js";
 
 const createBoard = asyncHandler(async (req, res) => {
   const { name, description } = req.body;
@@ -102,8 +104,15 @@ const deleteBoard = asyncHandler(async (req, res) => {
   if (!board) {
     throw new ApiError(404, "Board not found");
   }
-  
-  await Board.findByIdAndDelete(boardId);
+
+  const tasks = await Task.find({boardId}).select("_id");
+  const taskIds = tasks.map(task => task._id);
+
+  await Comment.deleteMany({taskId: { $in: taskIds }});
+
+  await Task.deleteMany({boardId});
+
+  await board.deleteOne();
 
   return res
     .status(200)

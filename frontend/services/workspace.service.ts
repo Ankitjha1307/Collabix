@@ -1,6 +1,6 @@
 import api from "@/lib/axios";
 import { WorkspaceMembersData } from "@/types/workspace";
-import { WorkspaceAssignee } from "@/types/workspace";
+import { Workspace, WorkspaceAssignee } from "@/types/workspace";
 
 export const getUserWorkspaces = async() => {
     const response = await api.get("/workspaces");
@@ -41,3 +41,12 @@ export const removeMember = async (workspaceId: string, userIdToRemove: string) 
   const response = await api.delete(`/workspaces/${workspaceId}/remove`, {data: {userIdToRemove}});
   return response.data;
 };
+
+export const updateWorkspace = async (workspaceId: string, updatedData: { name: string }) => {
+  const response = await api.patch(`/workspaces/${workspaceId}`, updatedData);
+  return response.data.data as Workspace;
+}
+
+export const deleteWorkspace = async (workspaceId: string) => {
+  await api.delete(`/workspaces/${workspaceId}`);
+}
