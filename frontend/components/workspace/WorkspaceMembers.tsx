@@ -15,9 +15,10 @@ import InviteMemberDialog from "./InviteMemberDialog";
 
 interface WorkspaceMembersProps {
     workspaceId: string;
+    currentUserRole: "OWNER" | "ADMIN" | "MEMBER";
 }
 
-export default function WorkspaceMembers({ workspaceId }: WorkspaceMembersProps) {
+export default function WorkspaceMembers({ workspaceId, currentUserRole }: WorkspaceMembersProps) {
     const [members, setMembers] = useState<WorkspaceMember[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -67,6 +68,9 @@ export default function WorkspaceMembers({ workspaceId }: WorkspaceMembersProps)
                         <MemberCard
                             key={member.userId._id}
                             member={member}
+                            workspaceId={workspaceId}
+                            currentUserRole={currentUserRole}
+                            onMembersUpdated={fetchMembers}
                         />
                         ))}
                     </div>

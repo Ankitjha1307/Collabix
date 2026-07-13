@@ -15,7 +15,7 @@ import WorkspaceMembers from "@/components/workspace/WorkspaceMembers";
 export default function WorkspacePage() {
   const { workspaceId } = useParams<{ workspaceId: string }>();
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState<"OWNER" | "ADMIN" | "MEMBER">("MEMBER");
   const [boards, setBoards] = useState<Board[]>([]);
 
   const fetchWorkspace = async () => {
@@ -61,7 +61,7 @@ export default function WorkspacePage() {
 
       <Separator className="my-8" />
 
-      <WorkspaceMembers workspaceId={workspaceId} />
+      <WorkspaceMembers workspaceId={workspaceId} currentUserRole={role} />
 
       <Separator className="my-8" />
 

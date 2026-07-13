@@ -31,3 +31,13 @@ export const inviteUserToWorkspace = async (workspaceId: string, username: strin
   const response = await api.post(`/workspaces/${workspaceId}/invite`, { username, role });
   return response.data;
 };
+
+export const updateMemberRole = async (workspaceId: string, usernameToUpdate: string, newRole: "ADMIN" | "MEMBER") => {
+  const response = await api.patch(`/workspaces/${workspaceId}/role`, { usernameToUpdate, newRole });
+  return response.data;
+};
+
+export const removeMember = async (workspaceId: string, userIdToRemove: string) => {
+  const response = await api.delete(`/workspaces/${workspaceId}/remove`, {data: {userIdToRemove}});
+  return response.data;
+};
