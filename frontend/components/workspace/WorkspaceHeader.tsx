@@ -41,6 +41,8 @@ export default function WorkspaceHeader({
           {role}
         </Badge>
       </div>
+
+      
     </div>
   );
 }

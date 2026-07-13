@@ -9,6 +9,7 @@ import type { Workspace } from "@/types/workspace";
 import type { Board } from "@/types/board";
 import { getBoardsByWorkspace } from "@/services/board.service";
 import BoardSection from "@/components/board/BoardSection";
+import WorkspaceMembers from "@/components/workspace/WorkspaceMembers";
 
 
 export default function WorkspacePage() {
@@ -57,6 +58,10 @@ export default function WorkspacePage() {
         name={workspace.name}
         role={role}
       />
+
+      <Separator className="my-8" />
+
+      <WorkspaceMembers workspaceId={workspaceId} />
 
       <Separator className="my-8" />
 

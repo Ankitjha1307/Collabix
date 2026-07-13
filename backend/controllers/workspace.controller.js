@@ -220,7 +220,7 @@ const listWorkspaceMembers = asyncHandler(async (req, res) => {
     .skip(skip)
     .limit(limit)
     .sort({ createdAt: -1 })
-    .populate("userId", "username email")
+    .populate("userId", "name username email")
     .select("userId role");
 
     const totalMembers = await WorkspaceMember.countDocuments({ workspaceId });

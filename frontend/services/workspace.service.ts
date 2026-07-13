@@ -17,22 +17,17 @@ export const getWorkspaceById = async ( workspaceId: string) => {
   return response.data;
 };
 
-export const getWorkspaceMembers = async (
-  workspaceId: string
-) => {
-  const response = await api.get(
-    `/workspaces/${workspaceId}/members`
-  );
-
+export const getWorkspaceMembers = async (workspaceId: string) => {
+  const response = await api.get(`/workspaces/${workspaceId}/members`);
   return response.data.data as WorkspaceMembersData;
 };
 
-export const getWorkspaceAssignees = async (
-  workspaceId: string
-) => {
-  const response = await api.get(
-    `/workspaces/${workspaceId}/assignees`
-  );
-
+export const getWorkspaceAssignees = async (workspaceId: string) => {
+  const response = await api.get(`/workspaces/${workspaceId}/assignees`);
   return response.data.data as WorkspaceAssignee[];
+};
+
+export const inviteUserToWorkspace = async (workspaceId: string, username: string, role: "ADMIN" | "MEMBER") => {
+  const response = await api.post(`/workspaces/${workspaceId}/invite`, { username, role });
+  return response.data;
 };

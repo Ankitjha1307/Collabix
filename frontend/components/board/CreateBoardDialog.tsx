@@ -1,10 +1,8 @@
 "use client";
 
 import { useState } from "react";
-
 import { createBoard } from "@/services/board.service";
 import type { Board } from "@/types/board";
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
