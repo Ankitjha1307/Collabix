@@ -6,7 +6,6 @@ import type { Board } from "@/types/board";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -16,7 +15,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Field, FieldGroup } from "@/components/ui/field";
 
 interface CreateBoardDialogProps {
   open: boolean;
@@ -33,6 +31,14 @@ export default function CreateBoardDialog({
 }: CreateBoardDialogProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
+  const [error, setError] = useState("");
+
+  const resetForm = () => {
+    setName("");
+    setDescription("");
+    setError("");
+  };
 
   const handleCreateBoard = async (
     e: React.FormEvent
@@ -40,7 +46,12 @@ export default function CreateBoardDialog({
     e.preventDefault();
 
     try {
-      if (!name.trim()) return;
+      if (!name.trim()){
+        setError("Board name is required");
+        return;
+      }
+      setIsCreating(true);
+      setError("");
 
       const response = await createBoard(
         workspaceId,
@@ -49,18 +60,27 @@ export default function CreateBoardDialog({
       );
 
       onBoardCreated(response.data);
-
-      setName("");
-      setDescription("");
-
+      resetForm();
       onOpenChange(false);
-    } catch (error) {
-      console.error("Error creating board:", error);
-    }
+    } catch (error: any) {
+        console.error(error);
+        setError(
+            error.response?.data?.message ??
+            "Failed to create board."
+        );
+      } finally {
+        setIsCreating(false);
+      }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(isOpen) => {
+      if (!isOpen) {
+        resetForm();
+      }
+
+      onOpenChange(isOpen);
+    }}>
       <DialogContent>
         <form
           onSubmit={handleCreateBoard}
@@ -74,11 +94,9 @@ export default function CreateBoardDialog({
             </DialogDescription>
           </DialogHeader>
 
-          <FieldGroup>
-            <Field>
-              <Label htmlFor="board-name">
-                Board Name
-              </Label>
+          <fieldset className="space-y-5 py-2" disabled={isCreating}>
+            <div className="space-y-2">
+              <Label htmlFor="board-name">Board Name</Label>
 
               <Input
                 id="board-name"
@@ -88,12 +106,10 @@ export default function CreateBoardDialog({
                 }
                 placeholder="Enter board name"
               />
-            </Field>
+            </div>
 
-            <Field>
-              <Label htmlFor="board-description">
-                Description
-              </Label>
+            <div className="space-y-2">
+              <Label htmlFor="board-description">Description</Label>
 
               <Textarea
                 id="board-description"
@@ -104,21 +120,28 @@ export default function CreateBoardDialog({
                 placeholder="Describe what this board is for..."
                 rows={4}
               />
-            </Field>
-          </FieldGroup>
+            </div>
+
+            {error && (
+              <p className="text-sm text-destructive"> {error} </p>
+            )}
+          </fieldset>
 
           <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">
-                Cancel
-              </Button>
-            </DialogClose>
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => onOpenChange(false)}
+              disabled={isCreating}
+            >
+              Cancel
+            </Button>
 
             <Button
               type="submit"
-              disabled={!name.trim()}
+              disabled={isCreating || !name.trim()}
             >
-              Create Board
+              {isCreating ? "Creating..." : "Create Board"}
             </Button>
           </DialogFooter>
         </form>

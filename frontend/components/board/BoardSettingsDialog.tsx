@@ -2,10 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
 import type { Board } from "@/types/board";
 import {updateBoard, deleteBoard} from "@/services/board.service";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

@@ -1,10 +1,6 @@
 import { LayoutGrid } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
-interface Props {
-  onCreate: () => void;
-}
-
 export default function EmptyBoards() {
   return (
     <Card className="flex flex-col items-center justify-center gap-4 py-16">

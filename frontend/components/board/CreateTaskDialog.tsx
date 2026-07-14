@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,8 +8,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  DialogTitle
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,28 +22,25 @@ import {
 } from "@/components/ui/select";
 
 import { createTask } from "@/services/task.service";
-import type {
-  CreateTaskData,
-  Task,
-  TaskPriority,
-  TaskStatus,
-} from "@/types/task";
+import type {CreateTaskData, Task, TaskPriority, TaskStatus} from "@/types/task";
 import type { WorkspaceAssignee } from "@/types/workspace";
 import { getWorkspaceAssignees } from "@/services/workspace.service";
 
 interface CreateTaskDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   boardId: string;
   workspaceId: string;
   onTaskCreated: (task: Task) => void;
 }
 
 export default function CreateTaskDialog({
+  open,
+  onOpenChange,
   boardId,
   workspaceId,
   onTaskCreated,
 }: CreateTaskDialogProps) {
-  const [open, setOpen] = useState(false);
-
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState<TaskStatus>("TODO");
@@ -54,7 +48,6 @@ export default function CreateTaskDialog({
   const [dueDate, setDueDate] = useState("");
   const [assignees, setAssignees] = useState<WorkspaceAssignee[]>([]);
   const [assignedTo, setAssignedTo] = useState("");
-
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState("");
 
@@ -68,13 +61,16 @@ export default function CreateTaskDialog({
     setError("");
   };
 
-  const handleCreateTask = async () => {
-    if (!name.trim()) {
-      setError("Task name is required");
-      return;
-    }
+  const handleCreateTask = async (
+    e: React.FormEvent
+  ) => {
+    e.preventDefault();
 
     try {
+      if (!name.trim()) {
+        setError("Task name is required");
+        return;
+      }
       setIsCreating(true);
       setError("");
 
@@ -92,10 +88,13 @@ export default function CreateTaskDialog({
       onTaskCreated(createdTask);
 
       resetForm();
-      setOpen(false);
-    } catch (error) {
-      console.error(error);
-      setError("Failed to create task. Please try again.");
+      onOpenChange(false);
+    } catch (error: any) {
+        console.error(error);
+        setError(
+            error.response?.data?.message ??
+            "Failed to create task."
+        );
     } finally {
       setIsCreating(false);
     }
@@ -120,25 +119,21 @@ export default function CreateTaskDialog({
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
-        setOpen(isOpen);
-        if (!isOpen) resetForm();
-      }}
-    >
-      <DialogTrigger asChild>
-        <Button>
-          <Plus className="mr-2 size-4" />
-          New Task
-        </Button>
-      </DialogTrigger>
+      if (!isOpen) {
+        resetForm();
+      }
 
+      onOpenChange(isOpen);
+    }}
+    >
       <DialogContent className="sm:max-w-lg">
-        <form onSubmit={(event) => {
-          event.preventDefault();
-          handleCreateTask();
-        }}>
+        <form 
+        onSubmit={handleCreateTask}
+        className="space-y-6"
+        >
         
           <DialogHeader>
-            <DialogTitle>Create new task</DialogTitle>
+            <DialogTitle>Create Task</DialogTitle>
             <DialogDescription>
               Add a task to this board and choose where it should start.
             </DialogDescription>
@@ -252,7 +247,7 @@ export default function CreateTaskDialog({
             <Button
               variant="outline"
               type="button"
-              onClick={() => setOpen(false)}
+              onClick={() => onOpenChange(false)}
               disabled={isCreating}
             >
               Cancel
