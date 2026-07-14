@@ -1,7 +1,6 @@
 "use client";
 
 import { Separator } from "@/components/ui/separator";
-import WorkspaceHeader from "@/components/workspace/WorkspaceHeader";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getWorkspaceById } from "@/services/workspace.service";
@@ -10,6 +9,7 @@ import type { Board } from "@/types/board";
 import { getBoardsByWorkspace } from "@/services/board.service";
 import BoardSection from "@/components/board/BoardSection";
 import WorkspaceMembers from "@/components/workspace/WorkspaceMembers";
+import WorkspaceHeader from "@/components/workspace/WorkspaceHeader";
 
 
 export default function WorkspacePage() {
@@ -42,10 +42,27 @@ export default function WorkspacePage() {
     };
 
   useEffect(() => {
-    fetchWorkspace();
-    fetchBoards();
+    const fetchPageData = async () => {
+      await Promise.all([
+        fetchWorkspace(),
+        fetchBoards(),
+      ]);
+    };
+
+    fetchPageData();
   }, [workspaceId]);
 
+  const handleWorkspaceUpdated = (
+    updatedWorkspace: Workspace
+  ) => {
+    setWorkspace(updatedWorkspace);
+  };
+
+  const handleBoardCreated = (
+    newBoard: Board
+  ) => {
+    setBoards((current) => [newBoard, ...current]);
+  };
   
 
   if (!workspace) {
@@ -53,24 +70,26 @@ export default function WorkspacePage() {
   }
 
   return (
-    <div>
+    <div className="space-y-8">
+
       <WorkspaceHeader
-        name={workspace.name}
-        role={role}
+        workspace={workspace}
+        onWorkspaceUpdated={handleWorkspaceUpdated}
+        onBoardCreated={handleBoardCreated}
       />
 
-      <Separator className="my-8" />
+      <Separator />
 
-      <WorkspaceMembers workspaceId={workspaceId} currentUserRole={role} />
+      <WorkspaceMembers
+        workspaceId={workspace._id}
+        currentUserRole={role}
+      />
 
-      <Separator className="my-8" />
+      <Separator />
 
       <BoardSection
         boards={boards}
-        workspaceId={workspaceId}
-        onBoardCreated={(board) =>
-          setBoards((prev) => [...prev, board])
-        }
+        workspaceId={workspace._id}
       />
     </div>
   );

@@ -46,9 +46,7 @@ export default function WorkspaceSettingsDialog({
   const router = useRouter();
 
   const [open, setOpen] = useState(false);
-
   const [name, setName] = useState(workspace.name);
-
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState("");
@@ -56,6 +54,8 @@ export default function WorkspaceSettingsDialog({
   const resetForm = () => {
     setName(workspace.name);
     setError("");
+    setIsSaving(false);
+    setIsDeleting(false);
   };
 
   const handleUpdateWorkspace = async () => {
@@ -115,7 +115,6 @@ export default function WorkspaceSettingsDialog({
         if (isOpen) {
           resetForm();
         }
-
         setOpen(isOpen);
       }}
     >

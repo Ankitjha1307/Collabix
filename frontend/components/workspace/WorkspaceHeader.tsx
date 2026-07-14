@@ -1,48 +1,60 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
-
+import { ArrowLeft, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import CreateBoardDialog from "@/components/board/CreateBoardDialog";
+import WorkspaceSettingsDialog from "./WorkspaceSettingsDialog";
+import type { Workspace } from "@/types/workspace";
+import type { Board } from "@/types/board";
 
-interface Props {
-  name: string;
-  role: string;
+interface WorkspaceHeaderProps {
+  workspace: Workspace;
+  onWorkspaceUpdated: (workspace: Workspace) => void;
+  onBoardCreated: (board: Board) => void;
 }
 
 export default function WorkspaceHeader({
-  name,
-  role,
-}: Props) {
-  return (
+    workspace,
+    onWorkspaceUpdated,
+    onBoardCreated
+} : WorkspaceHeaderProps ) {
+    const [open, setOpen] = useState(false);
+    return (
     <div className="space-y-6">
-      <Button
-        variant="ghost"
-        asChild
-        className="w-fit"
-      >
-        <Link href="/dashboard/workspaces">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Workspaces
-        </Link>
-      </Button>
+        <Button
+            variant="ghost"
+            asChild
+            className="w-fit"
+        >
+            <Link href="/dashboard/workspaces">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Workspaces
+            </Link>
+        </Button>
 
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-4xl font-bold">
-            {name}
-          </h1>
+        <div className="flex items-end justify-between">
+            <div><h1 className="text-4xl font-bold">{workspace.name}</h1></div>
+            <div className="flex items-center gap-3">
+                <Button onClick={() => setOpen(true)}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    New Board
+                </Button>
 
-          <p className="mt-2 text-muted-foreground">
-            Manage boards and collaborate with your team.
-          </p>
+                <WorkspaceSettingsDialog
+                    workspace={workspace}
+                    onWorkspaceUpdated={onWorkspaceUpdated}
+                />
+            </div>
         </div>
 
-        <Badge className="bg-purple-50 text-purple-700 dark:bg-purple-950 dark:text-purple-300">
-          {role}
-        </Badge>
-      </div>
-
-      
+        <CreateBoardDialog
+            open={open}
+            onOpenChange={setOpen}
+            workspaceId={workspace._id}
+            onBoardCreated={onBoardCreated}
+        />
     </div>
-  );
+);
 }
