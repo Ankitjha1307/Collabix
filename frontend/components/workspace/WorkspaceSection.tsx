@@ -23,7 +23,7 @@ export default function WorkspaceSection({
     <>
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold">
-          Your Workspaces
+          My Workspaces
         </h2>
 
         <Button onClick={() => setOpen(true)}>

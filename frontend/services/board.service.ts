@@ -14,3 +14,17 @@ export const getBoardById = async(boardId: string) => {
   const response = await api.get(`/boards/${boardId}`);
   return response.data;
 };  
+
+export const updateBoard = async (boardId: string,
+  updatedData: {
+    name: string;
+    description: string;
+  }
+) => {
+  const response = await api.patch(`/boards/${boardId}`, updatedData);
+  return response.data.data;
+};
+
+export const deleteBoard = async (boardId: string) => {
+  await api.delete(`/boards/${boardId}`);
+};

@@ -4,7 +4,7 @@ import {ApiError} from '../utils/ApiError.js';
 import {ApiResponse} from '../utils/ApiResponse.js';
 import { validateWorkspaceUser } from '../utils/validateWorkspaceUser.js';
 import mongoose from 'mongoose';
-
+import { Comment } from "../models/comment.model.js";
 
 const createTask = asyncHandler(async (req, res) => {
     const {name, description, status, priority, assignedTo, dueDate} = req.body;

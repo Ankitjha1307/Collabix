@@ -14,7 +14,7 @@ export default function BoardSection({
   return (
     <>
       <h2 className="text-2xl font-semibold">
-        Boards
+        My Boards
       </h2>
 
       <div className="mt-6">

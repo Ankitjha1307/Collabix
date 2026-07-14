@@ -34,6 +34,10 @@ export default function BoardPage() {
           }
     };
 
+    const handleBoardUpdated = (updatedBoard: Board) => {
+      setBoard(updatedBoard);
+  };
+
     const handleTaskCreated = (createdTask: Task) => {
       setTasks((currentTasks) => [
         createdTask,
@@ -68,10 +72,9 @@ export default function BoardPage() {
   return (
     <div className="p-6">
       <BoardHeader
-        name={board.name}
-        description = {board.description}
-        boardId={boardId}
+        board={board}
         workspaceId={workspaceId}
+        onBoardUpdated={handleBoardUpdated}
         onTaskCreated={handleTaskCreated}
       />
 
