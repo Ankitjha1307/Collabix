@@ -26,8 +26,8 @@ export default function Spotlight({
       }}
       className={cn(
         "pointer-events-none absolute left-1/2 top-0 -z-10 h-[36rem] w-[36rem] -translate-x-1/2 rounded-full",
-        "bg-violet-500/15 blur-[140px]",
-        "dark:bg-violet-500/20",
+        "bg-primary/20 dark:bg-primary/25 blur-[140px]",
+        "dark:bg-primary/25",
         className
       )}
     />

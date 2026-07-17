@@ -32,9 +32,9 @@ export default function DashboardPreview() {
     >
       {/* Glow */}
 
-      <div className="absolute inset-0 -z-10 rounded-[40px] bg-primary/15 blur-3xl" />
+      <div className="absolute inset-0 -z-10 rounded-[40px] bg-primary/20 blur-[80px]" />
 
-      <div className="overflow-hidden rounded-3xl border bg-card shadow-2xl">
+      <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-xl">
 
         <Image
           src="/hero/dashboard.png"

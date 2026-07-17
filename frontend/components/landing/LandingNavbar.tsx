@@ -28,7 +28,7 @@ export default function LandingNavbar() {
     <header className="sticky top-0 z-50">
       <Container>
 
-        <div className="mt-4 flex h-18 items-center justify-between rounded-2xl border border-border/50 bg-background/70 px-6 backdrop-blur-xl">
+        <div className="mt-4 flex h-18 items-center justify-between rounded-2xl border border-border bg-card/80 px-6 backdrop-blur-2xl shadow-sm">
 
           {/* Logo */}
 
