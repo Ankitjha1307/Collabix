@@ -37,7 +37,7 @@ export default function DashboardPage() {
         ]);
 
         setProfile(profileData);
-        setWorkspaces(workspaceData);
+        setWorkspaces(workspaceData.data);
       } catch (err) {
         console.error(err);
       } finally {
@@ -131,39 +131,73 @@ export default function DashboardPage() {
       {workspaces.length > 0 && (
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {workspaces.map((workspace) => (
-            <Card
+            <Link
               key={workspace._id}
-              className="rounded-2xl p-6 transition-all hover:-translate-y-1 hover:shadow-lg"
+              href={`/dashboard/workspaces/${workspace._id}`}
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold">
-                    {workspace.name}
-                  </h3>
+              <Card className="group h-full rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary hover:shadow-lg">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold group-hover:text-primary transition-colors">
+                      {workspace.name}
+                    </h3>
 
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Open to view boards and members
-                  </p>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      Created{" "}
+                      {new Date(workspace.createdAt).toLocaleDateString(undefined, {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </p>
+                  </div>
+
+                  <FolderKanban className="h-5 w-5 text-primary" />
                 </div>
 
-                <FolderKanban className="text-primary" />
-
-              </div>
-
-              <Button
-                className="mt-6 w-full"
-                asChild
-              >
-                <Link
-                  href={`/dashboard/workspaces/${workspace._id}`}
-                >
+                <div className="mt-8 flex items-center text-sm font-medium text-primary">
                   Open Workspace
-                </Link>
-              </Button>
-            </Card>
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </div>
+              </Card>
+            </Link>
           ))}
         </div>
       )}
+
+      <div className="space-y-4">
+        <h2 className="text-2xl font-semibold">Quick Actions</h2>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold">Create Workspace</h3>
+
+            <p className="mt-2 text-sm text-muted-foreground">
+              Start a new collaboration space for your team.
+            </p>
+
+            <Button className="mt-6" asChild>
+              <Link href="/dashboard/workspaces">
+                <Plus className="mr-2 h-4 w-4" />
+                New Workspace
+              </Link>
+            </Button>
+          </Card>
+
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold">Manage Workspaces</h3>
+
+            <p className="mt-2 text-sm text-muted-foreground">
+              View and manage all your existing workspaces.
+            </p>
+
+            <Button variant="outline" className="mt-6" asChild>
+              <Link href="/dashboard/workspaces">
+                Browse Workspaces
+              </Link>
+            </Button>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }
