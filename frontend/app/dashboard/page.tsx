@@ -57,40 +57,40 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-10">
-      <div>
-        <p className="text-sm text-muted-foreground">
-          Welcome back 👋
-        </p>
-
-        <h1 className="mt-2 text-4xl font-bold tracking-tight">
-          {profile?.name}
-        </h1>
-
-        <p className="mt-2 text-muted-foreground">
-          Here's a quick overview of your workspaces.
-        </p>
-      </div>
-
-      <div className="flex items-center justify-between">
+    <div className="mx-auto w-full max-w-7xl space-y-16">
+      <div className="flex flex-col gap-8 rounded-3xl border border-border bg-card p-8 shadow-sm lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h2 className="text-2xl font-semibold">
-            Your Workspaces
-          </h2>
+          <p className="text-sm font-medium text-primary">
+            👋 Welcome back
+          </p>
 
-          <p className="text-muted-foreground">
-            {workspaces.length} workspace
-            {workspaces.length !== 1 && "s"}
+          <h1 className="mt-3 text-4xl font-bold tracking-tight lg:text-5xl">
+            {profile?.name}
+          </h1>
+
+          <p className="mt-3 max-w-2xl text-muted-foreground">
+            Ready to organize your projects and collaborate with your team?
           </p>
         </div>
 
-        <Button asChild>
+        <Button size="lg" asChild>
           <Link href="/dashboard/workspaces">
-            View All
-
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <Plus className="mr-2 h-4 w-4" />
+            New Workspace
           </Link>
         </Button>
+      </div>
+
+      <div className="flex items-center justify-between border-b pb-4">
+        <div>
+          <h2 className="flex items-center gap-3 text-3xl font-bold tracking-tight">
+            Your Workspaces
+
+            <span className="rounded-full bg-accent/15 px-3 py-1 text-sm font-semibold text-accent">
+              {workspaces.length}
+            </span>
+          </h2>
+        </div>
       </div>
 
       {workspaces.length === 0 && (
@@ -135,14 +135,18 @@ export default function DashboardPage() {
               key={workspace._id}
               href={`/dashboard/workspaces/${workspace._id}`}
             >
-              <Card className="group h-full rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary hover:shadow-lg">
-                <div className="flex items-start justify-between">
+              <Card className="group h-full rounded-3xl border border-border bg-card p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-primary">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
+                    <FolderKanban className="h-6 w-6 text-primary" />
+                  </div>
+
                   <div>
-                    <h3 className="text-lg font-semibold group-hover:text-primary transition-colors">
+                    <h3 className="text-lg font-semibold transition-colors group-hover:text-primary">
                       {workspace.name}
                     </h3>
 
-                    <p className="mt-2 text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground">
                       Created{" "}
                       {new Date(workspace.createdAt).toLocaleDateString(undefined, {
                         month: "short",
@@ -151,8 +155,6 @@ export default function DashboardPage() {
                       })}
                     </p>
                   </div>
-
-                  <FolderKanban className="h-5 w-5 text-primary" />
                 </div>
 
                 <div className="mt-8 flex items-center text-sm font-medium text-primary">
@@ -164,40 +166,6 @@ export default function DashboardPage() {
           ))}
         </div>
       )}
-
-      <div className="space-y-4">
-        <h2 className="text-2xl font-semibold">Quick Actions</h2>
-        <div className="grid gap-4 md:grid-cols-2">
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold">Create Workspace</h3>
-
-            <p className="mt-2 text-sm text-muted-foreground">
-              Start a new collaboration space for your team.
-            </p>
-
-            <Button className="mt-6" asChild>
-              <Link href="/dashboard/workspaces">
-                <Plus className="mr-2 h-4 w-4" />
-                New Workspace
-              </Link>
-            </Button>
-          </Card>
-
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold">Manage Workspaces</h3>
-
-            <p className="mt-2 text-sm text-muted-foreground">
-              View and manage all your existing workspaces.
-            </p>
-
-            <Button variant="outline" className="mt-6" asChild>
-              <Link href="/dashboard/workspaces">
-                Browse Workspaces
-              </Link>
-            </Button>
-          </Card>
-        </div>
-      </div>
     </div>
   );
 }
