@@ -1,11 +1,7 @@
 import Link from "next/link";
 
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
+import { ClipboardList, ArrowRight } from "lucide-react";
 
 interface Props {
   id: string;
@@ -21,20 +17,33 @@ export default function BoardCard({
   updatedAt,
 }: Props) {
   return (
-    <Link
-      href={`/dashboard/workspaces/${workspaceId}/boards/${id}`}
-    >
-      <Card className="transition-all duration-200 hover:-translate-y-1 hover:shadow-lg cursor-pointer">
-        <CardHeader>
-          <CardTitle>{name}</CardTitle>
+    <Link href={`/dashboard/workspaces/${workspaceId}/boards/${id}`}>
+      <Card className="group h-full rounded-3xl border border-border bg-card p-7 transition-all duration-300 hover:-translate-y-1 hover:border-primary hover:shadow-xl">
+        <div className="flex items-center gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
+            <ClipboardList className="h-6 w-6 text-primary" />
+          </div>
 
-          <CardDescription>
-            Click to manage tasks
-            <p className="text-xs text-muted-foreground mt-4">
-              Updated {new Date(updatedAt).toLocaleDateString()}
+          <div>
+            <h3 className="text-lg font-semibold transition-colors group-hover:text-primary">
+              {name}
+            </h3>
+
+            <p className="mt-1 text-sm text-muted-foreground">
+              Updated{" "}
+              {new Date(updatedAt).toLocaleDateString(undefined, {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
             </p>
-          </CardDescription>
-        </CardHeader>
+          </div>
+        </div>
+
+        <div className="mt-8 flex items-center text-sm font-medium text-primary">
+          Open Board
+          <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+        </div>
       </Card>
     </Link>
   );

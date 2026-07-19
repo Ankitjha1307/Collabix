@@ -104,7 +104,9 @@ export default function CreateBoardDialog({
                 onChange={(e) =>
                   setName(e.target.value)
                 }
-                placeholder="Enter board name"
+                placeholder="e.g. Sprint Planning"
+                autoFocus
+                maxLength={60}
               />
             </div>
 
@@ -117,8 +119,9 @@ export default function CreateBoardDialog({
                 onChange={(e) =>
                   setDescription(e.target.value)
                 }
-                placeholder="Describe what this board is for..."
+                placeholder="Plan the current development sprint and track progress."
                 rows={4}
+                maxLength={250}
               />
             </div>
 

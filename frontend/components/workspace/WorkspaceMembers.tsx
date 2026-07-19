@@ -48,9 +48,14 @@ export default function WorkspaceMembers({ workspaceId, currentUserRole }: Works
             <AccordionItem value="members">
                 <AccordionTrigger>
                     <div className="flex items-center justify-between w-full">
-                        <div className="flex items-center gap-2">
-                            <Users className="size-4" />
-                            <span>Workspace Members ({members.length})</span>
+                        <div className="flex items-center gap-3">
+                            <div className="rounded-xl bg-primary/10 p-2">
+                                <Users className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                                <h3 className="font-semibold">Members</h3>
+                                <p className="text-sm text-muted-foreground">{members.length} collaborators</p>
+                            </div>
                         </div>
 
                         <div onClick={(event) => event.stopPropagation()}>

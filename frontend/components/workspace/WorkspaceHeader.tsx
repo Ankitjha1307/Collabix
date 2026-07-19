@@ -22,7 +22,7 @@ export default function WorkspaceHeader({
 } : WorkspaceHeaderProps ) {
     const [open, setOpen] = useState(false);
     return (
-    <div className="space-y-6">
+    <div className="space-y-8">
         <Button
             variant="ghost"
             asChild
@@ -35,7 +35,7 @@ export default function WorkspaceHeader({
         </Button>
 
         <div className="flex items-end justify-between">
-            <div><h1 className="text-4xl font-bold">{workspace.name}</h1></div>
+            <div><h1 className="text-5xl font-bold tracking-tight">{workspace.name}</h1></div>
             <div className="flex items-center gap-3">
                 <Button onClick={() => setOpen(true)}>
                     <Plus className="mr-2 h-4 w-4" />
@@ -55,6 +55,10 @@ export default function WorkspaceHeader({
             workspaceId={workspace._id}
             onBoardCreated={onBoardCreated}
         />
+
+        <p className="mt-3 text-muted-foreground max-w-2xl">
+            Manage boards, members and collaborate with your team inside this workspace.
+        </p>
     </div>
 );
 }

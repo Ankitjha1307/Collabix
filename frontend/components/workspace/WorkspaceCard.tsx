@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { Card } from "@/components/ui/card";
-import { LayoutGrid, ArrowRight } from "lucide-react";
+import { Folder, ArrowRight } from "lucide-react";
 
 interface Props {
   workspaceId: string;
@@ -19,7 +19,7 @@ export default function WorkspaceCard({
       <Card className="group h-full rounded-3xl border border-border bg-card p-7 transition-all duration-300 hover:-translate-y-1 hover:border-primary hover:shadow-xl">
         <div className="flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
-            <LayoutGrid className="h-6 w-6 text-primary" />
+            <Folder className="h-6 w-6 text-primary" />
           </div>
 
           <div>

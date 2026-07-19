@@ -70,7 +70,7 @@ export default function WorkspacePage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-16">
 
       <WorkspaceHeader
         workspace={workspace}
@@ -78,14 +78,10 @@ export default function WorkspacePage() {
         onBoardCreated={handleBoardCreated}
       />
 
-      <Separator />
-
       <WorkspaceMembers
         workspaceId={workspace._id}
         currentUserRole={role}
       />
-
-      <Separator />
 
       <BoardSection
         boards={boards}
