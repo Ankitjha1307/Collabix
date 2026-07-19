@@ -10,8 +10,8 @@ export default function EmptyWorkspaces({
   onCreate,
 }: Props) {
   return (
-    <Card className="flex flex-col items-center justify-center gap-4 py-16">
-      <LayoutGrid className="h-12 w-12 text-muted-foreground" />
+    <Card className="flex flex-col items-center justify-center gap-4 rounded-3xl py-20">
+      <LayoutGrid className="h-14 w-14 text-muted-foreground" />
 
       <div className="text-center">
         <h3 className="text-lg font-semibold">

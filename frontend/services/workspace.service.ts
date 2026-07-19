@@ -4,7 +4,7 @@ import { Workspace, WorkspaceAssignee } from "@/types/workspace";
 
 export const getUserWorkspaces = async() => {
     const response = await api.get("/workspaces");
-    return response.data;
+    return response.data.data;
 };
 
 export const createWorkspace = async(name: string) => {

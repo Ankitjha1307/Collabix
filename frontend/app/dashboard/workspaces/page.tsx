@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import type { Workspace } from "@/types/workspace";
 import WorkspaceSection from "@/components/workspace/WorkspaceSection";
 import { getUserWorkspaces } from "@/services/workspace.service";
-import { Separator } from "@/components/ui/separator";
 
 export default function WorkspacesPage() {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
@@ -15,7 +14,7 @@ export default function WorkspacesPage() {
 
   const fetchWorkspaces = async () => {
     const workspacesData = await getUserWorkspaces();
-    setWorkspaces(workspacesData.data);
+    setWorkspaces(workspacesData);
   };
 
   const handleWorkspaceCreated = (
@@ -28,7 +27,7 @@ export default function WorkspacesPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-16">
 
     <div>
       <h1 className="text-3xl font-bold">
@@ -36,11 +35,9 @@ export default function WorkspacesPage() {
       </h1>
 
       <p className="mt-2 text-muted-foreground">
-        Manage your team workspaces.
+        Create, organize and manage collaboration spaces for every project.
       </p>
     </div>
-
-    <Separator />
 
     <WorkspaceSection
       workspaces={workspaces}

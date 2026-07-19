@@ -37,13 +37,9 @@ export default function CreateWorkspaceDialog({
 
     try {
       if (!name.trim()) return;
-
       const response = await createWorkspace(name);
-
       onWorkspaceCreated(response.data);
-
       setName("");
-
       onOpenChange(false);
     } catch (error) {
       console.error("Error creating workspace:", error);
@@ -77,7 +73,9 @@ export default function CreateWorkspaceDialog({
                 onChange={(e) =>
                   setName(e.target.value)
                 }
-                placeholder="Enter workspace name"
+                placeholder="e.g. Product Team"
+                autoFocus
+                maxLength={50}
               />
             </Field>
           </FieldGroup>

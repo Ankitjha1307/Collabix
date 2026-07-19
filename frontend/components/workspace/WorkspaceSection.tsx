@@ -22,9 +22,13 @@ export default function WorkspaceSection({
   return (
     <>
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold">
-          My Workspaces
-        </h2>
+        <h2 className="flex items-center gap-3 text-3xl font-bold tracking-tight">
+          Your Workspaces
+
+          <span className="rounded-full bg-accent/15 px-3 py-1 text-sm font-semibold text-accent">
+            {workspaces.length}
+          </span>
+        </h2> 
 
         <Button onClick={() => setOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
@@ -32,13 +36,13 @@ export default function WorkspaceSection({
         </Button>
       </div>
 
-      <div className="mt-6">
+      <div className="mt-8">
         {workspaces.length === 0 ? (
           <EmptyWorkspaces
             onCreate={() => setOpen(true)}
           />
         ) : (
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {workspaces.map((workspace) => (
               <WorkspaceCard
                 key={workspace._id}

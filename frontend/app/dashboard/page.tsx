@@ -37,7 +37,7 @@ export default function DashboardPage() {
         ]);
 
         setProfile(profileData);
-        setWorkspaces(workspaceData.data);
+        setWorkspaces(workspaceData);
       } catch (err) {
         console.error(err);
       } finally {
@@ -91,6 +91,16 @@ export default function DashboardPage() {
             </span>
           </h2>
         </div>
+
+        <Button
+          className="mt-6"
+          asChild
+        >
+          <Link href="/dashboard/workspaces">
+            Go to workspaces
+            <ArrowRight />
+          </Link>
+        </Button>
       </div>
 
       {workspaces.length === 0 && (
