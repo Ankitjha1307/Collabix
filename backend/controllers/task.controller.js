@@ -50,9 +50,11 @@ const getBoardTasks = asyncHandler(async (req, res) => {
     const skip = (page - 1) * limit;
 
     const tasks = await Task.find({ boardId })
+    .populate("assignedTo", "username")
+    .populate("createdBy", "username")
+    .sort({ createdAt: -1 })
     .skip(skip)
-    .limit(limit)
-    .sort({ createdAt: -1 });
+    .limit(limit);
 
     const totalTasks = await Task.countDocuments({ boardId });
 

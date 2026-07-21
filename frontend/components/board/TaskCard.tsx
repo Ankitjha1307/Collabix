@@ -5,7 +5,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays } from "lucide-react";
+import { CalendarDays, User } from "lucide-react";
 import type { Task } from "@/types/task";
 
 interface Props {
@@ -13,46 +13,85 @@ interface Props {
   onTaskSelect: (task: Task) => void;
 }
 
-export default function TaskCard({ task, onTaskSelect }: Props) {
+const priorityConfig = {
+  LOW: {
+    label: "Low",
+    variant: "secondary",
+  },
+  MEDIUM: {
+    label: "Medium",
+    variant: "default",
+  },
+  HIGH: {
+    label: "High",
+    variant: "destructive",
+  },
+} as const;
+
+export default function TaskCard({
+  task,
+  onTaskSelect,
+}: Props) {
+  const priority =
+    priorityConfig[task.priority];
+
   return (
     <Card
       onClick={() => onTaskSelect(task)}
-      className="cursor-pointer gap-3 py-4 transition-all duration-200 hover:-translate-y-1 hover:border-purple-500/40 hover:shadow-lg">
-      <CardHeader className="px-4">
+      className="
+        cursor-pointer
+        rounded-2xl
+        py-5
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:border-primary
+        hover:shadow-xl
+      "
+    >
+      <CardHeader className="space-y-4 px-5 pb-3">
         <div className="flex items-start justify-between gap-3">
-          <CardTitle className="text-sm leading-snug">
+          <CardTitle className="flex-1 text-[15px] font-semibold leading-6 line-clamp-2">
             {task.name}
           </CardTitle>
 
           <Badge
-            variant={
-              task.priority === "HIGH"
-                ? "destructive"
-                : task.priority === "MEDIUM"
-                  ? "default"
-                  : "secondary"
-            }
-            className="shrink-0 text-[10px]"
+            variant={priority.variant}
+            className="shrink-0"
           >
-            {task.priority}
+            {priority.label}
           </Badge>
         </div>
-      </CardHeader>
 
-      <CardContent className="space-y-3 px-4">
         {task.description && (
-          <p className="line-clamp-2 text-sm text-muted-foreground">
+          <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
             {task.description}
           </p>
         )}
+      </CardHeader>
 
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <CalendarDays className="size-3.5" />
-          <span>
-            {task.dueDate
-              ? new Date(task.dueDate).toLocaleDateString()
+      <CardContent className="px-5 pt-2">
+        <div className="flex items-center justify-between border-t pt-4 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1.5">
+            <User className="h-3.5 w-3.5" />
+            <span className="truncate">
+              {task.assignedTo.username}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-1.5">
+            <CalendarDays className="h-3.5 w-3.5" />
+
+            <span>
+              {task.dueDate? new Date(task.dueDate).toLocaleDateString(undefined,
+                {
+                  month: "short",
+                  day: "numeric",
+                }
+              )
               : "No due date"}
-          </span>
+            </span>
+          </div>
         </div>
       </CardContent>
     </Card>

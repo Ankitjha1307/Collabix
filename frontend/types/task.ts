@@ -7,10 +7,16 @@ export interface Task {
   name: string;
   description: string;
   boardId: string;
-  createdBy: string;
+  createdBy: {
+    _id: string;
+    username: string;
+  };
   status: TaskStatus;
   priority: TaskPriority;
-  assignedTo: string;
+  assignedTo: {
+    _id: string;
+    username: string;
+  };
   dueDate?: string;
   createdAt: string;
   updatedAt: string;
