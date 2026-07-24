@@ -40,7 +40,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Separator } from "../ui/separator";
+import { Trash2 } from "lucide-react";
 
 interface TaskDetailsDialogProps {
   task: Task;
@@ -65,7 +65,7 @@ export default function TaskDetailsDialog({
   const [status, setStatus] = useState<TaskStatus>(task.status);
   const [dueDate, setDueDate] = useState(task.dueDate ? task.dueDate.split("T")[0] : "");
   const [assignees, setAssignees] = useState<WorkspaceAssignee[]>([]);
-  const [assignedTo, setAssignedTo] = useState(task.assignedTo); 
+  const [assignedTo, setAssignedTo] = useState(task.assignedTo._id); 
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoadingComments, setIsLoadingComments] = useState(false);
   const [commentContent, setCommentContent] = useState("");
@@ -130,7 +130,7 @@ export default function TaskDetailsDialog({
     try {
       setError("");
       const updatedTask = await assignTask(task._id, newAssigneeId);
-      setAssignedTo(updatedTask.assignedTo);
+      setAssignedTo(updatedTask.assignedTo._id);
       onTaskUpdated(updatedTask);
     } catch (error) {
       console.error(error);
@@ -244,22 +244,24 @@ export default function TaskDetailsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85dvh] sm:max-w-lg">
+      <DialogContent className="max-h-[90dvh] sm:max-w-2xl">
         <form
-          className="flex max-h-[90dvh] flex-col"
+          className="flex max-h-[85dvh] flex-col"
           onSubmit={(event) => {
             event.preventDefault();
             handleUpdateTask();
           }}
         >
           <DialogHeader className="border-b px-6 py-4">
-            <DialogTitle>Edit task</DialogTitle>
+            <DialogTitle className="text-xl">
+              {task.name}
+            </DialogTitle>
             <DialogDescription>
               Update this task&apos;s details.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="flex-1 overflow-y-auto px-6 py-5">
+          <div className="flex-1 overflow-y-auto px-6 py-5 space-y-8">
             <fieldset
               disabled={isSaving}
               className="space-y-5"
@@ -284,45 +286,51 @@ export default function TaskDetailsDialog({
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label>Priority</Label>
-                <Select
-                  value={priority}
-                  onValueChange={(value) =>
-                    setPriority(value as TaskPriority)
-                  }
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
+              <h3 className="text-lg font-semibold tracking-tight">
+                Task Settings
+              </h3>
 
-                  <SelectContent>
-                    <SelectItem value="LOW">Low</SelectItem>
-                    <SelectItem value="MEDIUM">Medium</SelectItem>
-                    <SelectItem value="HIGH">High</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Priority</Label>
+                  <Select
+                    value={priority}
+                    onValueChange={(value) =>
+                      setPriority(value as TaskPriority)
+                    }
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
 
-              <div className="space-y-2">
-                <Label>Status</Label>
+                    <SelectContent>
+                      <SelectItem value="LOW">Low</SelectItem>
+                      <SelectItem value="MEDIUM">Medium</SelectItem>
+                      <SelectItem value="HIGH">High</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                <Select
-                  value={status}
-                  onValueChange={(value) =>
-                    handleStatusChange(value as TaskStatus)
-                  }
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
+                <div className="space-y-2">
+                  <Label>Status</Label>
 
-                  <SelectContent>
-                    <SelectItem value="TODO">To Do</SelectItem>
-                    <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-                    <SelectItem value="DONE">Done</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <Select
+                    value={status}
+                    onValueChange={(value) =>
+                      handleStatusChange(value as TaskStatus)
+                    }
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                      <SelectItem value="TODO">To Do</SelectItem>
+                      <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                      <SelectItem value="DONE">Done</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -368,52 +376,73 @@ export default function TaskDetailsDialog({
               )}
             </fieldset>
 
-            <Separator className="my-6" />
+            <div className="space-y-8">
+              <div className="rounded-2xl border p-5">
+                <div className="space-y-1">
+                  <h3 className="text-lg font-semibold tracking-tight">
+                    Comments ({comments.length})
+                  </h3>
 
-            <div className="space-y-5">
-              <div>
-                <h3 className="font-semibold">Comments</h3>
-                <p className="text-sm text-muted-foreground">Discuss this task with your team.</p>
-              </div>
+                  <p className="text-sm text-muted-foreground">
+                    Discuss this task with your team.
+                  </p>
+                </div>
 
-              <Textarea placeholder="Write a comment..." value={commentContent} onChange={(event) => setCommentContent(event.target.value)} />
+                <div className="space-y-5">
+                  <Textarea rows={4} placeholder="Write a comment..." value={commentContent} onChange={(event) => setCommentContent(event.target.value)} />
+                  
+                  <div className="flex justify-end">
+                    <Button
+                    type="button"
+                    size="sm"
+                    onClick={handleCreateComment} 
+                    disabled= {isCreatingComment ||!commentContent.trim()}>
+                      {isCreatingComment ? "Adding..." : "Add Comment"}</Button>
+                  </div>
+                </div>
 
-              <Button type="button" onClick={handleCreateComment} disabled={isCreatingComment ||!commentContent.trim()}>{isCreatingComment ? "Adding..." : "Add Comment"}</Button>
+                <div className="space-y-4 pt-5">
+                  {isLoadingComments ? (
+                    <p className="text-sm text-muted-foreground">Loading comments...</p>
+                  ) : comments.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No comments yet.</p>
+                  ) : (
+                        <div className="space-y-5">
+                          {comments.map((comment) => {
+                            const canDeleteComment =
+                              currentUser?._id === comment.author._id;
 
-              <div className="space-y-3">
-                {isLoadingComments ? (
-                  <p className="text-sm text-muted-foreground">Loading comments...</p>
-                ) : comments.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No comments yet.</p>
-                ) : (
-                      <div className="space-y-4">
-                        {comments.map((comment) => {
-                          const canDeleteComment =
-                            currentUser?._id === comment.author._id;
+                            return (
+                              <div key={comment._id} className="rounded-2xl border p-7 hover: bg-muted/40 transition-colors">
+                                <div className="mb-2 flex items-center justify-between">
+                                  <span className="text-sm font-medium">{comment.author.username}</span>
 
-                          return (
-                            <div key={comment._id} className="rounded-lg border p-3">
-                              <div className="mb-2 flex items-center justify-between">
-                                <span className="text-sm font-medium">{comment.author.username}</span>
+                                  <div className="flex items-center gap-3">
+                                    <span className="text-xs text-muted-foreground">
+                                      {new Date(comment.createdAt).toLocaleString(undefined,
+                                        {
+                                          month: "short",
+                                          day: "numeric",
+                                          hour: "numeric",
+                                          minute: "2-digit",
+                                        }
+                                      )}
+                                    </span>
 
-                                <div className="flex items-center gap-3">
-                                  <span className="text-xs text-muted-foreground">
-                                    {new Date(comment.createdAt).toLocaleString()}
-                                  </span>
-
-                                  {canDeleteComment && (<Button size="sm" variant="ghost" onClick={() => handleDeleteComment(comment._id)}>Delete</Button>)}
+                                    {canDeleteComment && (<Button size="icon" variant="ghost" onClick={() => handleDeleteComment(comment._id)}><Trash2 className="h-4 w-4" /></Button>)}
+                                  </div>
                                 </div>
+                                <p className="text-sm">{comment.content}</p>
                               </div>
-                              <p className="text-sm">{comment.content}</p>
-                            </div>
-                        )})}
-                      </div>
-                )}
+                          )})}
+                        </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
 
-          <DialogFooter className="border-t px-6 py-4 sm:justify-between">
+          <DialogFooter className="border-t px-6 py-5 sm:justify-between">
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button
