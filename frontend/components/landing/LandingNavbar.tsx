@@ -29,9 +29,6 @@ export default function LandingNavbar() {
       <Container>
 
         <div className="mt-4 flex h-18 items-center justify-between rounded-2xl border border-border bg-card/80 px-6 backdrop-blur-2xl shadow-sm">
-
-          {/* Logo */}
-
           <Link
             href="/"
             className="flex items-center gap-3"
@@ -47,8 +44,6 @@ export default function LandingNavbar() {
               Collabix
             </span>
           </Link>
-
-          {/* Center */}
 
           <nav className="hidden items-center gap-10 lg:flex">
 
@@ -69,8 +64,6 @@ export default function LandingNavbar() {
             ))}
 
           </nav>
-
-          {/* Right */}
 
           <div className="flex items-center gap-3">
 

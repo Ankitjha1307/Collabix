@@ -14,8 +14,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { register } from "@/services/auth.service";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { ArrowLeft } from "lucide-react";
 
 export default function CardDemo() {
   const router = useRouter();
@@ -25,6 +27,7 @@ export default function CardDemo() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const handleSubmit = async (
       e: React.FormEvent<HTMLFormElement>
     ) => {
@@ -32,14 +35,13 @@ export default function CardDemo() {
       setError("");
   
       try {
-        const response = await register({
+        setIsLoading(true);
+        await register({
           name,
           username,
           email,
           password,
         });
-
-        console.log("REGISTER RESPONSE:", response);
 
         router.push("/login");
       } catch (error: any) {
@@ -47,25 +49,58 @@ export default function CardDemo() {
           error.response?.data?.message ||
           "Registration failed. Please try again."
         );
+      }finally{
+        setIsLoading(false);
       }
     };
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>Register for a Collabix account</CardTitle>
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4">
+
+      <div className="absolute -left-32 top-1/3 h-72 w-72 rounded-full bg-primary/20 blur-[120px]" />
+      <div className="absolute -right-32 bottom-1/3 h-72 w-72 rounded-full bg-primary/20 blur-[120px]" />
+
+      <div className="absolute left-6 top-6">
+        <Button variant="ghost" asChild>
+          <Link href="/">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Home
+          </Link>
+        </Button>
+      </div>
+
+      <Card className="relative z-10 w-full max-w-md rounded-3xl border shadow-2xl">
+        <CardHeader className="space-y-3 text-center p-y-6">
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-3">
+              <Image
+                src="/brand/Logo.svg"
+                alt="Collabix"
+                width={42}
+                height={42}
+              />
+              <h1 className="text-3xl font-bold tracking-tight">
+                Collabix
+              </h1>
+            </div>
+
+            <p className="mt-3 text-sm text-muted-foreground">
+              Collaborate on projects with a workspace built for modern teams.
+            </p>
+          </div>
+
+          <CardTitle className="text-2xl">Create your account</CardTitle>
           <CardDescription>
-            Enter your details below to create an account
+            Start organizing your workspaces and projects.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit}>
+          <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
-              <p className="text-red-500">
+              <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
                 {error}
-              </p>
+              </div>
             )}
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-5">
               <div className="grid gap-2">
                 <Label htmlFor="name">Full Name</Label>
                 <Input
@@ -75,6 +110,7 @@ export default function CardDemo() {
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  autoComplete="name"
                 />
               </div>
               <div className="grid gap-2">
@@ -82,10 +118,11 @@ export default function CardDemo() {
                 <Input
                   id="username"
                   type="text"
-                  placeholder="Enter your username"
+                  placeholder="Choose your username"
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
+                  autoComplete="username"
                 />
               </div>
               <div className="grid gap-2">
@@ -97,37 +134,51 @@ export default function CardDemo() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
                 />
               </div>
-              <div className="relative">
+              <div className="grid gap-2">
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
                   <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
+                  placeholder="Create your password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                />
+                  className="pr-5"
+                  />
 
-                <Button
+                  <button
                   type="button"
-                  onClick={() =>
-                    setShowPassword(!showPassword)
-                  }
-                  className="absolute right-1 top-1/2 -translate-y-1/2 p-1 text-gray-200 hover:bg-gray-500"
-                >
-                  {showPassword ? <EyeOff /> : <Eye />}
-                </Button>
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground">
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
                 </div>
+              </div>
             </div>
-            <CardFooter className="flex-col gap-2">
-              <Button type="submit" className="w-full">
-                Register
+            <CardFooter className="flex-col gap-4">
+              <Button type="submit" className="w-full" disabled={isLoading} size="lg">
+                {isLoading? "Creating Account..." : "Create Account"}
               </Button>
               <CardAction className="w-full">
-                    <Link href="/login" className="w-full">
-                      <Button variant="link">Already have an account? Login!</Button>
-                    </Link>
-                  </CardAction>
+                    <p className="text-center text-sm text-muted-foreground">
+                      Already have an account?{" "}
+
+                      <Link
+                          href="/login"
+                          className="font-medium text-primary hover:underline"
+                      >
+                        Sign in
+                      </Link>
+                  </p>
+                </CardAction>
             </CardFooter>
           </form>
         </CardContent>

@@ -1,6 +1,4 @@
 "use client";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -15,7 +13,11 @@ import { Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { login } from "@/services/auth.service";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import { ArrowLeft } from "lucide-react";
 
 export default function CardDemo() {
   const router = useRouter();
@@ -24,15 +26,16 @@ export default function CardDemo() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
-
-    console.log("FORM SUBMITTED");
+    setError("");
 
     try {
+      setIsLoading(true);
       const isEmail = identifier.includes("@");
 
       const response = await login({
@@ -41,16 +44,9 @@ export default function CardDemo() {
         password,
       });
 
-      console.log("LOGIN RESPONSE:", response);
-
       localStorage.setItem(
       "accessToken",
       response.data.accessToken
-    );
-
-    console.log(
-      "Stored Token:",
-      localStorage.getItem("accessToken")
     );
 
     router.push("/dashboard");
@@ -59,25 +55,57 @@ export default function CardDemo() {
         error.response?.data?.message ||
         "Invalid Credentials. Please try again."
       );
+    }finally{
+        setIsLoading(false);
     }
   };
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle>Login to your Collabix account</CardTitle>
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4">
+
+      <div className="absolute -left-32 top-1/3 h-72 w-72 rounded-full bg-primary/20 blur-[120px]" />
+      <div className="absolute -right-32 bottom-1/3 h-72 w-72 rounded-full bg-primary/20 blur-[120px]" />
+
+      <div className="absolute left-6 top-6">
+        <Button variant="ghost" asChild>
+          <Link href="/">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Home
+          </Link>
+        </Button>
+      </div>
+
+      <Card className="relative z-10 w-full max-w-md rounded-3xl border shadow-2xl">
+        <CardHeader className="space-y-3 text-center p-y-6">
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-3">
+              <Image
+                src="/brand/Logo.svg"
+                alt="Collabix"
+                width={42}
+                height={42}
+              />
+              <h1 className="text-3xl font-bold tracking-tight">
+                Collabix
+              </h1>
+            </div>
+
+            <p className="mt-3 text-sm text-muted-foreground">
+              Collaborate on projects with a workspace built for modern teams.
+            </p>
+          </div>
+          <CardTitle className="text-2xl">Sign in to your account!</CardTitle>
           <CardDescription>
-            Enter your email/username below to login to your account
+            Get back to organizing your workspaces and projects.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit}>
+          <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
-              <p className="text-red-500">
+              <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
                 {error}
-              </p>
+              </div>
             )}
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-5">
               <div className="grid gap-2">
                 <Label htmlFor="identifier">Email/Username</Label>
                 <Input
@@ -90,45 +118,46 @@ export default function CardDemo() {
                 />
               </div>
               <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <Link
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </Link>
-                </div>
+                <Label htmlFor="password">Password</Label>
                 <div className="relative">
                   <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
+                  placeholder="Create your password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                />
+                  className="pr-5"
+                  />
 
-                <Button
+                  <button
                   type="button"
-                  onClick={() =>
-                    setShowPassword(!showPassword)
-                  }
-                  className="absolute right-1 top-1/2 -translate-y-1/2 p-1 text-gray-200 hover:bg-gray-500"
-                >
-                  {showPassword ? <EyeOff /> : <Eye />}
-                </Button>
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground">
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
                 </div>
-                
               </div>
             </div>
-            <CardFooter className="flex-col gap-2">
-              <Button type="submit" className="w-full">
-                Login
+            <CardFooter className="flex-col gap-4">
+              <Button type="submit" className="w-full" disabled={isLoading} size="lg">
+                {isLoading? "Signing in..." : "Sign in"}
               </Button>
               <CardAction className="w-full">
-                <Link href="/register" className="w-full">
-                  <Button variant="link">Don't have an account? Sign up!</Button>
-                </Link>
+                <p className="text-center text-sm text-muted-foreground">
+                      Don't have an account?{" "}
+
+                      <Link
+                          href="/register"
+                          className="font-medium text-primary hover:underline"
+                      >
+                        Sign up
+                      </Link>
+                  </p>
               </CardAction>
             </CardFooter>
           </form>
