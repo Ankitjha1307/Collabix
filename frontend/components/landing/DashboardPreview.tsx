@@ -1,5 +1,4 @@
 "use client";
-
 import Image from "next/image";
 import { motion } from "framer-motion";
 
@@ -28,13 +27,12 @@ export default function DashboardPreview() {
           ease: "easeInOut",
         },
       }}
-      className="relative"
+      className="relative mx-auto"
     >
-      {/* Glow */}
 
       <div className="absolute inset-0 -z-10 rounded-[40px] bg-primary/20 blur-[80px]" />
 
-      <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-xl">
+      <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-2xl">
 
         <Image
           src="/hero/dashboard.png"

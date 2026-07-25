@@ -20,7 +20,7 @@ export default function HeroContent() {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7 }}
-      className="max-w-xl"
+      className="mx-auto max-w-4xl text-center"
     >
       <div className="inline-flex items-center gap-2 rounded-full border bg-card/80 px-4 py-2 text-sm font-medium backdrop-blur-md">
         <Sparkles className="text-accent" />
@@ -31,16 +31,14 @@ export default function HeroContent() {
       </div>
 
       <h1 className="mt-10 text-5xl font-bold leading-[1.05] tracking-tight lg:text-7xl">
-        From ideas
-        <br />
-        to <span className="text-primary">execution.</span>
+        From ideas to <span className="text-primary">Execution.</span>
       </h1>
 
       <p className="mt-6 text-lg leading-8 text-muted-foreground">
         Collaborate, manage projects, and ship faster with a workspace built for modern teams.
       </p>
 
-      <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+      <div className="mt-10 flex flex-wrap justify-center gap-4">
         <Button
           asChild
           size="lg"
@@ -62,14 +60,14 @@ export default function HeroContent() {
             href="https://github.com/ankitjha1307"
             target="_blank"
           >
-            <FaGithub className="mr-2 h-4 w-4" />
+            <FaGithub className="text-accent mr-2 h-4 w-4 rounded-full" />
 
             View GitHub
           </Link>
         </Button>
       </div>
       
-      <div className="mt-12 flex flex-wrap gap-3">
+      <div className="mt-12 flex flex-wrap justify-center gap-3">
         {features.map((feature) => (
           <div
             key={feature}
