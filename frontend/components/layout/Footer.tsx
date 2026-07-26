@@ -26,24 +26,24 @@ export default function Footer() {
         
         <div className="flex items-center gap-5 text-sm">
           <Link
-            href="/privacy"
+            href="#product"
             className="text-muted-foreground transition-colors hover:text-foreground"
           >
-            Privacy
+            Product
           </Link>
 
           <Link
-            href="/terms"
+            href="#features"
             className="text-muted-foreground transition-colors hover:text-foreground"
           >
-            Terms
+            Features
           </Link>
 
           <Link
-            href="/contact"
+            href="https://github.com/ankitjha1307"
             className="text-muted-foreground transition-colors hover:text-foreground"
           >
-            Contact
+            GitHub
           </Link>
         </div>
       </div>

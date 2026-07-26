@@ -415,7 +415,7 @@ export default function TaskDetailsDialog({
                             return (
                               <div key={comment._id} className="rounded-2xl border p-7 hover: bg-muted/40 transition-colors">
                                 <div className="mb-2 flex items-center justify-between">
-                                  <span className="text-sm font-medium">{comment.author.username}</span>
+                                  <span className="text-sm text-primary font-medium">{comment.author.username}</span>
 
                                   <div className="flex items-center gap-3">
                                     <span className="text-xs text-muted-foreground">
@@ -429,7 +429,7 @@ export default function TaskDetailsDialog({
                                       )}
                                     </span>
 
-                                    {canDeleteComment && (<Button size="icon" variant="ghost" onClick={() => handleDeleteComment(comment._id)}><Trash2 className="h-4 w-4" /></Button>)}
+                                    {canDeleteComment && (<Button size="icon" variant="destructive" onClick={() => handleDeleteComment(comment._id)}><Trash2 className="h-4 w-4" /></Button>)}
                                   </div>
                                 </div>
                                 <p className="text-sm">{comment.content}</p>
