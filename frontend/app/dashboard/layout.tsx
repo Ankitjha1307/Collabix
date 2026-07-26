@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { AppSidebar } from "@/components/layout/AppSidebar";
-import { Navbar } from "@/components/layout/Navbar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { getProfile } from "@/services/auth.service";
+import { Navbar } from "@/components/layout/Navbar";
 
 export default function DashboardLayout({
   children,
@@ -47,8 +47,7 @@ export default function DashboardLayout({
       <AppSidebar />
 
       <div className="flex flex-1 flex-col">
-        <Navbar />
-
+        <Navbar/>
         <main className="flex-1 p-6">
           {children}
         </main>

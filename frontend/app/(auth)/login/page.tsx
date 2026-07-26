@@ -36,7 +36,7 @@ export default function CardDemo() {
 
     try {
       setIsLoading(true);
-      const isEmail = identifier.includes("@");
+      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
 
       const response = await login({
         email: isEmail ? identifier : undefined,

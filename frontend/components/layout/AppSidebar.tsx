@@ -6,6 +6,10 @@ import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { User } from "@/types/user";
 import { getProfile } from "@/services/auth.service";
+import {
+  Avatar,
+  AvatarFallback,
+} from "@/components/ui/avatar";
 
 import {
   LayoutDashboard,
@@ -24,6 +28,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar
 } from "@/components/ui/sidebar";
 import { logout } from "@/services/auth.service";
 
@@ -45,14 +50,15 @@ export function AppSidebar() {
     const pathname = usePathname();
 
     const [user, setUser] = useState<User | null>(null);
+    const { isMobile, setOpenMobile } = useSidebar();
     
     const handleLogout = async () => {
       try {
         await logout();
 
         localStorage.removeItem("accessToken");
-
         router.push("/login");
+         if (isMobile) setOpenMobile(false);
       } catch (error) {
         console.error(error);
       }
@@ -67,7 +73,20 @@ export function AppSidebar() {
       }
     }
 
-    useEffect(() => {loadProfile();}, []); 
+    useEffect(() => {loadProfile();}, []);
+
+    const handleNavigation = () => {
+      if (isMobile) setOpenMobile(false);
+    };
+
+    const initials = user?.name
+    ? user.name
+      .split(" ")
+      .map((part) => part[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase()
+    : "U";
 
 
   return (
@@ -114,7 +133,7 @@ export function AppSidebar() {
                       isActive={isActive}
                       className="h-11 rounded-xl px-3 transition-all hover:bg-primary/10 hover:text-primary data-[active=true]:bg-primary data-[active=true]:text-primary-foreground data-[active=true]:shadow-sm"
                     >
-                      <Link href={item.url}>
+                      <Link href={item.url} onClick={handleNavigation}>
                         <item.icon className="h-5 w-5 shrink-0" />
                         <span>{item.title}</span>
                       </Link>
@@ -130,9 +149,11 @@ export function AppSidebar() {
       <SidebarFooter className="border-t p-4">
         <div className="mb-4 rounded-2xl border bg-card p-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-              <User2 className="h-5 w-5 text-primary" />
-            </div>
+            <Avatar className="h-10 w-10 border">
+              <AvatarFallback className="bg-primary font-semibold text-primary-foreground">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
 
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold">
@@ -140,14 +161,14 @@ export function AppSidebar() {
               </p>
 
               <p className="text-xs text-primary">
-                @{user?.username}
+                {user?.username}
               </p>
             </div>
           </div>
         </div>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton  asChild className="h-11 rounded-xl hover:bg-primary/10 hover:text-primary">
+            <SidebarMenuButton  asChild className="h-11 rounded-xl hover:bg-primary/10 hover:text-primary" onClick={handleNavigation}>
               <Link href="#" className="flex items-center gap-3">
                 <User2 />
                 <span>Profile</span>
