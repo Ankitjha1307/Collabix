@@ -171,6 +171,8 @@ const getCurrentUser = asyncHandler(async (req, res) => {
                 username: req.user.username,
                 email: req.user.email,
                 avatarUrl: req.user.avatarUrl,
+                avatarUrl: req.user.avatarUrl,
+                createdAt: req.user.createdAt
             },
             "Profile retrieved successfully"
         )
