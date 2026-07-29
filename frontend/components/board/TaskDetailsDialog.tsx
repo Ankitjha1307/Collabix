@@ -41,6 +41,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Trash2 } from "lucide-react";
+import { LoadingSpinner } from "../common/loading";
 
 interface TaskDetailsDialogProps {
   task: Task;
@@ -103,9 +104,8 @@ export default function TaskDetailsDialog({
           ? updatedTask.dueDate.split("T")[0]
           : ""
       );
-    } catch (error) {
-      console.error(error);
-      setError("Failed to update task. Please try again.");
+    } catch (error : any) {
+      setError(error.response?.data?.message ?? "Failed to update task. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -119,7 +119,6 @@ export default function TaskDetailsDialog({
       setStatus(updatedTask.status);
       onTaskUpdated(updatedTask);
     } catch (error) {
-      console.error(error);
       setError("Failed to update task status.");
     }
   };
@@ -132,9 +131,8 @@ export default function TaskDetailsDialog({
       const updatedTask = await assignTask(task._id, newAssigneeId);
       setAssignedTo(updatedTask.assignedTo._id);
       onTaskUpdated(updatedTask);
-    } catch (error) {
-      console.error(error);
-      setError("Failed to reassign task.");
+    } catch (error : any) {
+      setError(error.response?.data?.message ?? "Failed to reassign task.");
     }
   };
 
@@ -144,9 +142,8 @@ export default function TaskDetailsDialog({
       setError("");
       await deleteTask(task._id);
       onTaskDeleted(task._id);
-    } catch (error) {
-      console.error(error);
-      setError("Failed to delete task.");
+    } catch (error : any) {
+      setError(error.response?.data?.message ?? "Failed to delete task.");
     } finally {
       setIsDeleting(false);
     }
@@ -159,9 +156,8 @@ export default function TaskDetailsDialog({
       const data = await getTaskComments(task._id);
 
       setComments(data.comments);
-    } catch (error) {
-      console.error(error);
-      setError("Failed to load comments.");
+    } catch (error : any) {
+      setError(error.response?.data?.message ?? "Failed to load comments.");
     } finally {
       setIsLoadingComments(false);
     }
@@ -178,7 +174,6 @@ export default function TaskDetailsDialog({
       const newComment = await createComment(task._id, {
         content: commentContent.trim(),
       });
-      console.log("Comment Author:", newComment.author);
 
       setComments((currentComments) => [
         newComment,
@@ -186,9 +181,8 @@ export default function TaskDetailsDialog({
       ]);
 
       setCommentContent("");
-    } catch (error) {
-      console.error(error);
-      setError("Failed to create comment.");
+    } catch (error : any) {
+      setError(error.response?.data?.message ?? "Failed to create comment.");
     } finally {
       setIsCreatingComment(false);
     }
@@ -203,9 +197,8 @@ export default function TaskDetailsDialog({
           (comment) => comment._id !== commentId
         )
       );
-    } catch (error) {
-      console.error(error);
-      setError("Failed to delete comment.");
+    } catch (error : any) {
+      setError(error.response?.data?.message ?? "Failed to delete comment.");
     }
   };
 
@@ -214,9 +207,8 @@ export default function TaskDetailsDialog({
       try {
         const data = await getWorkspaceAssignees(workspaceId);
         setAssignees(data);
-      } catch (error) {
-        console.error(error);
-        setError("Failed to load workspace assignees.");
+      } catch (error : any) {
+        setError(error.response?.data?.message ?? "Failed to load workspace assignees.");
       }
     };
 
@@ -224,7 +216,10 @@ export default function TaskDetailsDialog({
   }, [workspaceId]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open){
+      setCommentContent("");
+      setError("");
+    }
 
     fetchComments();
   }, [task._id, open]);
@@ -234,8 +229,8 @@ export default function TaskDetailsDialog({
       try {
         const user = await getProfile();
         setCurrentUser(user);
-      } catch (error) {
-        console.error(error);
+      } catch (error : any) {
+        setError(error.response?.data?.message ?? "Failed to fetch user Profile.");
       }
     };
 
@@ -403,7 +398,7 @@ export default function TaskDetailsDialog({
 
                 <div className="space-y-4 pt-5">
                   {isLoadingComments ? (
-                    <p className="text-sm text-muted-foreground">Loading comments...</p>
+                    <div className="flex h-32 items-center justify-center"><LoadingSpinner text="Loading comments..." /></div>
                   ) : comments.length === 0 ? (
                     <p className="text-sm text-muted-foreground">No comments yet.</p>
                   ) : (
@@ -413,7 +408,7 @@ export default function TaskDetailsDialog({
                               currentUser?._id === comment.author._id;
 
                             return (
-                              <div key={comment._id} className="rounded-2xl border p-7 hover: bg-muted/40 transition-colors">
+                              <div key={comment._id} className="rounded-2xl border p-7 hover:bg-muted/40 transition-colors">
                                 <div className="mb-2 flex items-center justify-between">
                                   <span className="text-sm text-primary font-medium">{comment.author.username}</span>
 

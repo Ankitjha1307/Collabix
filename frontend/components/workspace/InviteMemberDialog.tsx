@@ -55,7 +55,6 @@ export default function InviteMemberDialog({
     resetForm();
     setOpen(false);
   } catch (error : any) {
-    console.log(error.response?.data?.message);
     setError(error.response?.data?.message ?? "Failed to invite member.");
   } finally {
     setIsInviting(false);

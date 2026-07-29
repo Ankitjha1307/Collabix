@@ -10,6 +10,8 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { Task } from "@/types/task";
 import TaskDetailsDialog from "@/components/board/TaskDetailsDialog";
+import { LoadingSpinner } from "@/components/common/loading";
+import NotFound from "@/app/not-found";
 
 export default function BoardPage() {
     const { boardId, workspaceId } = useParams<{
@@ -19,18 +21,23 @@ export default function BoardPage() {
     const [board, setBoard] = useState<Board | null>(null);
     const [tasks, setTasks] = useState<Task[]>([]);
     const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     const selectedTask = tasks.find((task) => task._id === selectedTaskId) ?? null;
 
-    const fetchBoard = async () => {
+    const fetchBoardData = async () => {
           try {
-            const response = await getBoardById(boardId);
-            const tasksData = await getBoardTasks(boardId);
-    
-              setBoard(response.data);
-              setTasks(tasksData.tasks);
-          } catch (error) {
-            console.error(error);
+            const [boardResponse, tasksResponse] = await Promise.all([
+              getBoardById(boardId),
+              getBoardTasks(boardId),
+            ]);
+            setBoard(boardResponse.data);
+            setTasks(tasksResponse.tasks);
+          } catch(error : any){
+            setError(error.response?.data?.message ?? "Failed to load board!");
+          } finally{
+            setLoading(false);
           }
     };
 
@@ -63,12 +70,15 @@ export default function BoardPage() {
     };
 
     useEffect(() => {
-        fetchBoard();
+        fetchBoardData();
       }, [boardId]);
 
-  if (!board) {
-    return <div>Loading...</div>;
-  }
+  if (loading) return <LoadingSpinner text="Loading board..." />;
+
+  if (error) return (<div className="mx-auto max-w-7xl rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-destructive">{error}</div>);
+  
+  if (!board) return <NotFound />;
+
   return (
     <div className="p-6">
       <BoardHeader

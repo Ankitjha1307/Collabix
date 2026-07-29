@@ -13,6 +13,7 @@ import type { Workspace } from "@/types/workspace";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import DashboardLoading from "./loading";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -20,13 +21,13 @@ export default function DashboardPage() {
   const [profile, setProfile] = useState<User | null>(null);
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
 
     if (!token) {
-      router.push("/login");
+      router.replace("/login");
       return;
     }
 
@@ -49,13 +50,7 @@ export default function DashboardPage() {
     loadDashboard();
   }, [router]);
 
-  if (loading) {
-    return (
-      <div className="py-10">
-        Loading dashboard...
-      </div>
-    );
-  }
+  if (loading) return <DashboardLoading />;
 
   return (
     <>
@@ -74,9 +69,7 @@ export default function DashboardPage() {
               {profile?.name}
             </h1>
 
-            <p className="mt-3 max-w-2xl text-muted-foreground">
-              Ready to organize your projects and collaborate with your team?
-            </p>
+            <p className="mt-3 max-w-2xl text-muted-foreground">Ready to organize your projects and collaborate with your team?</p>
           </div>
 
           <Button size="lg" asChild>
@@ -109,7 +102,6 @@ export default function DashboardPage() {
         </div>
 
         {workspaces.length === 0 && (
-
           <Card className="rounded-2xl p-12">
             <div className="flex flex-col items-center text-center">
               <FolderKanban
@@ -117,9 +109,7 @@ export default function DashboardPage() {
                 size={42}
               />
 
-              <h3 className="text-xl font-semibold">
-                No workspaces yet
-              </h3>
+              <h3 className="text-xl font-semibold">No workspaces yet</h3>
 
               <p className="mt-2 max-w-md text-muted-foreground">
                 Create your first workspace to start
@@ -131,11 +121,8 @@ export default function DashboardPage() {
                 asChild
               >
                 <Link href="/dashboard/workspaces">
-
                   <Plus className="mr-2 h-4 w-4" />
-
                   Create Workspace
-
                 </Link>
               </Button>
             </div>

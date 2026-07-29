@@ -7,9 +7,8 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { User2, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { logout } from "@/services/auth.service";
+import { getProfile, logout } from "@/services/auth.service";
 import { User } from "@/types/user";
-import { getProfile } from "@/services/auth.service";
 
 import {
   Avatar,
@@ -50,28 +49,19 @@ export function Navbar() {
   const [user, setUser] = useState<User | null>(null);
   const currentPage =
     pageConfig[pathname] ?? {
-      title: "Collabix",
-      subtitle: "Collaborate smarter.",
+      title: "Dashboard",
+      subtitle: "Collaborate smarter",
     };
 
     const handleLogout = async () => {
-      try {
-        await logout();
-
-        localStorage.removeItem("accessToken");
-        router.push("/login");
-      } catch (error) {
-        console.error(error);
-      }
+      await logout();
+      localStorage.removeItem("accessToken");
+      router.replace("/login");
     };
 
     const loadProfile = async () => {
-      try {
-        const profileData = await getProfile();
-        setUser(profileData);
-      } catch (error) {
-        console.log(error);
-      }
+      const profileData = await getProfile();
+      setUser(profileData);
     }
 
     useEffect(() => {loadProfile();}, []);

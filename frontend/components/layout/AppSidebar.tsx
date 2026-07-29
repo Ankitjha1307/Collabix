@@ -113,7 +113,6 @@ export function AppSidebar() {
         </SidebarHeader>
 
         <SidebarContent>
-          <p className="px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Workspace</p>
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu>
@@ -141,20 +140,6 @@ export function AppSidebar() {
         </SidebarContent>
 
         <SidebarFooter className="border-t p-4">
-          <div className="mb-4 rounded-2xl border bg-card p-3">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-10 w-10 border">
-                <AvatarFallback className="bg-primary font-semibold text-primary-foreground">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold">{user?.name}</p>
-                <p className="text-xs text-primary">{user?.username}</p>
-              </div>
-            </div>
-          </div>
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton  asChild className="h-11 rounded-xl hover:bg-primary/10 hover:text-primary" onClick={handleNavigation}>

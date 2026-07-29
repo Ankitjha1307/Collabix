@@ -39,7 +39,6 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
 const registerUser = asyncHandler( async (req, res) => {
     const { username, name, email, password } = req.body;
-    console.log("Username: "+ username);
 
     if([username, name, email, password].some((field) => !field?.trim())){
         throw new ApiError(400, "All fields are mandatory!");
@@ -65,8 +64,6 @@ const registerUser = asyncHandler( async (req, res) => {
     if(!user){
         throw new ApiError(500, "unable to register user, please try again later!");
     }
-
-    console.log("Registered User: "+ user);
     return res.status(201).json(
         new ApiResponse(201, 
         {
