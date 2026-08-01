@@ -123,6 +123,12 @@ export default function TaskDetailsDialog({
     }
   };
 
+  useEffect(() => {
+    if (!open) return;
+
+    setAssignedTo(task.assignedTo?._id);
+  }, [task, open]);
+
   const handleAssigneeChange = async (
     newAssigneeId: string
   ) => {
@@ -328,29 +334,29 @@ export default function TaskDetailsDialog({
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label>Assignee</Label>
+                <div className="space-y-2">
+                  <Label>Assignee</Label>
 
-                <Select
-                  value={assignedTo}
-                  onValueChange={handleAssigneeChange}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select assignee" />
-                  </SelectTrigger>
+                  <Select
+                    value={assignedTo}
+                    onValueChange={handleAssigneeChange}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select assignee" />
+                    </SelectTrigger>
 
-                  <SelectContent>
-                    {assignees.map((assignee) => (
-                      <SelectItem
-                        key={assignee._id}
-                        value={assignee._id}
-                      >
-                        {assignee.username}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+                    <SelectContent>
+                      {assignees.map((assignee) => (
+                        <SelectItem
+                          key={assignee._id}
+                          value={assignee._id}
+                        >
+                          {assignee.username}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
               <div className="space-y-2">
                 <Label htmlFor={`task-due-date-${task._id}`}>Due date</Label>

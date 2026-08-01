@@ -96,6 +96,8 @@ const updateTask = asyncHandler(async (req, res) => {
 
     await task.save();
 
+    await task.populate("assignedTo", "username name avatarUrl");
+
     return res
         .status(200)
         .json(
@@ -131,6 +133,8 @@ const assignTask = asyncHandler(async (req, res) => {
 
     task.assignedTo = userId;
     await task.save();
+
+    await task.populate("assignedTo", "username name avatarUrl");
 
     return res
     .status(200)

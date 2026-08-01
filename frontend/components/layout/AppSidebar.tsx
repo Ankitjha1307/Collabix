@@ -44,9 +44,8 @@ export function AppSidebar() {
     const router = useRouter();
     const pathname = usePathname();
 
-    const [user, setUser] = useState<User | null>(null);
     const { isMobile, setOpenMobile } = useSidebar();
-    const [error, setError] = useState(false);
+    const [error, setError] = useState("");
     
     const handleLogout = async () => {
       try {
@@ -55,35 +54,14 @@ export function AppSidebar() {
         localStorage.removeItem("accessToken");
         router.push("/login");
          if (isMobile) setOpenMobile(false);
-      } catch (error) {
-        console.error(error);
+      } catch (error : any) {
+        setError(error.response?.data?.message || "Logout failed. Please try again.");
       }
     };
-
-    const loadProfile = async () => {
-      try {
-        const profileData = await getProfile();
-        setUser(profileData);
-      } catch (error : any) {
-        setError(error);
-      }
-    }
-
-    useEffect(() => {loadProfile();}, []);
 
     const handleNavigation = () => {
       if (isMobile) setOpenMobile(false);
     };
-
-    const initials = user?.name
-    ? user.name
-      .split(" ")
-      .map((part) => part[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase()
-    : "U";
-
 
   return (
     <>
