@@ -123,7 +123,7 @@ export default function CardDemo() {
                   <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Create your password"
+                  placeholder="Enter your password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

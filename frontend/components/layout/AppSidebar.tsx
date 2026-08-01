@@ -76,7 +76,7 @@ export function AppSidebar() {
             className="flex items-center gap-3"
           >
             <Image
-              src="/brand/logo.svg"
+              src="/brand/Logo.svg"
               alt="Collabix"
               width={100}
               height={100}
