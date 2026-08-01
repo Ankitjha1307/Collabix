@@ -7,6 +7,7 @@ import { AppSidebar } from "@/components/layout/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { getProfile } from "@/services/auth.service";
 import { Navbar } from "@/components/layout/Navbar";
+import { LoadingSpinner } from "@/components/common/loading";
 
 export default function DashboardLayout({
   children,
@@ -15,6 +16,7 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -29,18 +31,17 @@ export default function DashboardLayout({
         await getProfile();
         setIsAuthenticated(true);
       } catch (error) {
-        console.error(error);
-        localStorage.removeItem("accessToken");
         router.replace("/login");
+      }finally{
+        setLoading(false);
       }
     };
 
     checkAuth();
   }, [router]);
 
-  if (!isAuthenticated) {
-    return <div>Loading...</div>;
-  }
+  if (loading) return <LoadingSpinner />;
+  if (!isAuthenticated) return null;
 
   return (
     <SidebarProvider>

@@ -15,27 +15,25 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
     try {
         const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
-        const user = await User.findById(decodedToken?.userId);
-
+        const user = await User.findById(decodedToken.userId).select("+refreshToken");
+        
         if(!user || user.refreshToken !== incomingRefreshToken) {
             throw new ApiError(401, "Unauthorized Access! User not found or invalid refresh token!");
         }
 
         const newAccessToken = generateAccessToken(user._id);
-
+    
         return res.status(200).json(
             new ApiResponse(
                 200,
-                {
-                    accessToken: newAccessToken
-                },
-                "Access Token refreshed successfully!"
+                { accessToken: newAccessToken },
+                "Access token refreshed."
             )
-        )
-    } catch (error) {
+        );
+    } catch {
         throw new ApiError(401, "Unauthorized Access! Invalid Refresh Token!");
     }
-})
+});
 
 const registerUser = asyncHandler( async (req, res) => {
     const { username, name, email, password } = req.body;

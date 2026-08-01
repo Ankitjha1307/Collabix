@@ -65,7 +65,7 @@ export default function DashboardPage() {
               👋 Welcome back
             </p>
 
-            <h1 className="mt-3 text-4xl font-bold tracking-tight lg:text-5xl">
+            <h1 className="mt-3 text-4xl font-bold tracking-tight lg:text-2xl">
               {profile?.name}
             </h1>
 

@@ -122,7 +122,7 @@ export default function ProfilePage() {
 
                             <div>
                                 <p className="text-sm text-primary">Username</p>
-                                <p className="mt-1 font-medium">@{user?.username}</p>
+                                <p className="mt-1 font-medium">{user?.username}</p>
                             </div>
 
                             <Separator />
