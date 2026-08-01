@@ -45,7 +45,7 @@ export default function LandingNavbar() {
             className="flex items-center gap-3"
           >
             <Image
-              src="/brand/logo.svg"
+              src="/brand/Logo.svg"
               alt="Collabix"
               width={34}
               height={34}
@@ -99,7 +99,7 @@ export default function LandingNavbar() {
               <div className="border-b pb-4">
                 <div className="flex items-center gap-3">
                   <Image
-                    src="/brand/logo.svg"
+                    src="/brand/Logo.svg"
                     alt="Collabix"
                     width={36}
                     height={36}
