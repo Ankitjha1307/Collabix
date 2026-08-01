@@ -1,8 +1,10 @@
 "use client";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { useTheme } from "next-themes";
 
 export default function DashboardPreview() {
+  const { resolvedTheme } = useTheme();
   return (
     <motion.div
       initial={{
@@ -35,7 +37,11 @@ export default function DashboardPreview() {
       <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-2xl">
 
         <Image
-          src="/hero/dashboard.png"
+          src={
+          resolvedTheme === "dark"
+            ? "/DashboardDark.jpeg"
+            : "/DashboardLight.jpeg"
+        }
           alt="Collabix Dashboard"
           width={1600}
           height={1000}

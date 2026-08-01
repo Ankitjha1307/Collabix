@@ -8,21 +8,23 @@ import Spotlight from "@/components/landing/Spotlight";
 
 export default function Home() {
   return (
-    <div className="relative overflow-hidden">
+    <>
+      <LandingNavbar />
 
-      <Spotlight />
-      
-      <LandingNavbar/>
+      <div className="relative overflow-hidden">
 
-      <Hero/>
+        <Spotlight />
+        
+        <Hero/>
 
-      <ProductSection/>
+        <ProductSection/>
 
-      <FeaturesSection/>
+        <FeaturesSection/>
 
-      <CTASection/>
+        <CTASection/>
 
-      <Footer/>
-    </div>
+        <Footer/>
+      </div>
+    </>
   );
 }

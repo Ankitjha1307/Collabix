@@ -1,7 +1,4 @@
 import axios from "axios";
-import { useRouter } from "next/navigation";
-
-const router = useRouter();
 
 const api = axios.create({
   baseURL: "http://localhost:5000/api",
@@ -47,7 +44,7 @@ api.interceptors.response.use(
       } catch (refreshError) {
 
         localStorage.removeItem("accessToken");
-        router.replace("/login");
+        window.location.href = "/login";
         return Promise.reject(refreshError);
       }
     }

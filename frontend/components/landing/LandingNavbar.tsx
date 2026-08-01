@@ -36,7 +36,7 @@ const links = [
 
 export default function LandingNavbar() {
   return (
-    <header className="sticky top-0 z-50">
+    <header className="sticky top-0 z-50 backdrop-blur-xl">
       <Container>
 
         <div className="mt-4 flex h-18 items-center justify-between rounded-2xl border border-border bg-card/80 px-4 sm:px-6 backdrop-blur-2xl shadow-sm">
