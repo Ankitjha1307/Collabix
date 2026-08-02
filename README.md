@@ -668,13 +668,13 @@ For major changes, please open an issue first to discuss your proposed improveme
 
 <p align="center">
   <a href="https://github.com/Ankitjha1307">
-    <img src="https://cdn.simpleicons.org/github" alt="GitHub" width="38"/>
+    <img src="https://skillicons.dev/icons?i=github" width="42" alt="GitHub"/>
   </a>
 
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
   <a href="https://www.linkedin.com/in/ankitjha1307">
-    <img src="https://cdn.simpleicons.org/linkedin/0A66C2" alt="LinkedIn" width="38"/>
+    <img src="https://skillicons.dev/icons?i=linkedin" width="42" alt="LinkedIn"/>
   </a>
 </p>
 
