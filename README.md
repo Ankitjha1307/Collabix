@@ -1,7 +1,7 @@
 # 🫱🏻‍🫲🏼 Collabix
 
 <p align="center">
-  <img src="" alt="Collabix Logo" width="180"/>
+  <img src="./docs/screenshots/Logo.svg" alt="Collabix Logo" width="180"/>
 </p>
 
 <p align="center">
@@ -668,11 +668,13 @@ For major changes, please open an issue first to discuss your proposed improveme
 
 <p align="center">
   <a href="https://github.com/Ankitjha1307">
-    <img src="https://img.shields.io/badge/GitHub-Ankitjha1307-181717?style=for-the-badge&logo=github" alt="GitHub"/>
+    <img src="https://img.shields.io/badge/-181717?style=for-the-badge&logo=github" alt="GitHub"/>
   </a>
 
-  <a href=" https://www.linkedin.com/in/ankitjha1307">
-    <img src="https://img.shields.io/badge/LinkedIn-Ankit%20Jha-0A66C2?style=for-the-badge&logo=linkedin" alt="LinkedIn"/>
+  &nbsp;&nbsp;
+
+  <a href="https://www.linkedin.com/in/ankitjha1307">
+    <img src="https://img.shields.io/badge/-0A66C2?style=for-the-badge&logo=linkedin" alt="LinkedIn"/>
   </a>
 </p>
 
