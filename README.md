@@ -671,8 +671,6 @@ For major changes, please open an issue first to discuss your proposed improveme
     <img src="https://skillicons.dev/icons?i=github" width="42" alt="GitHub"/>
   </a>
 
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
   <a href="https://www.linkedin.com/in/ankitjha1307">
     <img src="https://skillicons.dev/icons?i=linkedin" width="42" alt="LinkedIn"/>
   </a>
