@@ -668,13 +668,13 @@ For major changes, please open an issue first to discuss your proposed improveme
 
 <p align="center">
   <a href="https://github.com/Ankitjha1307">
-    <img src="https://img.shields.io/badge/-181717?style=for-the-badge&logo=github" alt="GitHub"/>
+    <img src="https://cdn.simpleicons.org/github" alt="GitHub" width="38"/>
   </a>
 
-  &nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
   <a href="https://www.linkedin.com/in/ankitjha1307">
-    <img src="https://img.shields.io/badge/-0A66C2?style=for-the-badge&logo=linkedin" alt="LinkedIn"/>
+    <img src="https://cdn.simpleicons.org/linkedin/0A66C2" alt="LinkedIn" width="38"/>
   </a>
 </p>
 
