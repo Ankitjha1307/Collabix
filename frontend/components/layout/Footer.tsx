@@ -40,7 +40,7 @@ export default function Footer() {
           </Link>
 
           <Link
-            href="https://github.com/ankitjha1307"
+            href="https://github.com/Ankitjha1307/Collabix"
             className="text-muted-foreground transition-colors hover:text-foreground"
           >
             GitHub

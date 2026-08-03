@@ -57,11 +57,10 @@ export default function HeroContent() {
           asChild
         >
           <Link
-            href="https://github.com/ankitjha1307"
+            href="https://github.com/Ankitjha1307/Collabix"
             target="_blank"
           >
             <FaGithub className="text-accent mr-2 h-4 w-4 rounded-full" />
-
             View GitHub
           </Link>
         </Button>

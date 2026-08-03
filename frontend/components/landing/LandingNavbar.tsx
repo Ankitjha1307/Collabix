@@ -29,7 +29,7 @@ const links = [
   },
   {
     label: "GitHub",
-    href: "https://github.com/ankitjha1307",
+    href: "https://github.com/Ankitjha1307/Collabix",
     icon: FaGithub
   },
 ];
