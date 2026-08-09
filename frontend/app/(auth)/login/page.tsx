@@ -149,14 +149,19 @@ export default function CardDemo() {
               </Button>
               <CardAction className="w-full">
                 <p className="text-center text-sm text-muted-foreground">
-                      Don&apos;t have an account?{" "}
-                      <Link
-                          href="/register"
-                          className="font-medium text-primary hover:underline"
-                      >
-                        Sign up
-                      </Link>
-                  </p>
+                  Don&apos;t have an account?{" "}
+                  <Link
+                      href="/register"
+                      className="font-medium text-primary hover:underline"
+                  >
+                    Sign up
+                  </Link>
+                </p>
+
+                <p className="text-sm text-muted-foreground mt-2 text-center">
+                  Guest username: demouser@collabix <br />
+                  Guest password: demouser@collabix1234
+                </p>
               </CardAction>
             </CardFooter>
           </form>
